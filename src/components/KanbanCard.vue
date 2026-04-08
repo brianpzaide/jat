@@ -7,7 +7,13 @@
     })"
   >
     <div class="card-company">
-      {{ application.company }}
+      <span>{{ application.company }}</span>
+      <span
+        class="status-pill"
+        :class="statusClass(application.status)"
+      >
+          {{ application.status }}
+      </span>
     </div>
     <div class="card-position">
       {{ application.position }}
@@ -117,56 +123,48 @@
       editingShortNote.value = !editingShortNote.value
     }
 
+  function statusClass(status) {
+    return status.toLowerCase().replaceAll(" ", "-")
+  }
+
+
 </script>
 
 <style scoped>
-.kanban-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  cursor: pointer;
-  height: 180px;
-  min-height: 180px;
-  max-height: 180px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
+  .kanban-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    min-height: 160px;
+    max-height: 160px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
 
   .kanban-card.active {
     border-color: #4f46e5;
     background: #eef2ff;
   }
 
-  /* .card-company {
+  .card-company {
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.90rem;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 4px;
+    display: flex;
   }
 
   .card-position {
     color: #374151;
-    font-size: 0.9rem;
-  } */
-
-.card-company {
-  font-weight: 700;
-  font-size: 0.95rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.card-position {
-  color: #374151;
-  font-size: 0.9rem;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
+    font-size: 0.95rem;
+  }
 
   .short-note-row {
     display: flex;
@@ -179,14 +177,14 @@
     min-width: 0;
   }
 
-.short-note-text {
-  font-size: 0.85rem;
-  color: #6b7280;
-  line-height: 1.4;
-  overflow-y: auto;
-  max-height: 48px;
-  word-break: break-word;
-}
+  .short-note-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.4;
+    overflow-y: auto;
+    max-height: 48px;
+    word-break: break-word;
+  }
 
   .short-note-input {
     width: 100%;
@@ -262,5 +260,32 @@
     flex: 1;
     min-height: 0;
     padding: 16px;
+  }
+
+  .status-pill {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: white;
+  }
+
+  .status-pill.offer {
+    background: #4caf50;
+  }
+
+  .status-pill.in-progress {
+    background: #ff9800;
+  }
+
+  .status-pill.reject {
+    background: #f7160e;
+  }
+
+  .status-pill.ready-to-apply {
+    background: #4b5dd0;
+  }
+
+  .status-pill.archive {
+    background: #5a5b63;
   }
 </style>

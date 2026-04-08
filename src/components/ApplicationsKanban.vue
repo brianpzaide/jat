@@ -4,11 +4,13 @@
       v-for="column in columns"
       :key="column.key"
       :label="column.label"
+      :statusKey="column.key"
       :applications="getApplicationsForColumn(column.key)"
       :activeApplicationId="activeApplicationId"
       @application-selected="emit('application-selected', $event)"
       @update-short-note="emit('update-short-note', $event)"
       @update-application-notes="emit('update-application-notes', $event)"
+      @application-moved="emit('application-moved', $event)"
     />
   </div>
 </template>
@@ -30,7 +32,8 @@ const props = defineProps({
 const emit = defineEmits([
   'application-selected',
   'update-short-note',
-  'update-application-notes'
+  'update-application-notes',
+  'application-moved'
 ])
 
 const columns = [
@@ -56,6 +59,7 @@ function getApplicationsForColumn(columnKey) {
   min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 8px 4px 8px 0;
+  /* padding: 8px 4px 8px 0; */
 }
+
 </style>

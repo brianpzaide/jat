@@ -60,6 +60,7 @@
         @application-selected="application_selected"
         @update-short-note="emit('update-short-note', $event)"
         @update-application-notes="forwardNotesUpdate"
+        @application-moved="forwardApplicationMoved"
       />
     </div>
   </div>
@@ -131,6 +132,13 @@ function forwardNotesUpdate(payload) {
   emit("update-application-notes", payload)
 }
 
+function forwardApplicationMoved({applicationId, newStatus}) {
+  const application = applications.value.find(app => app.id === applicationId)
+  if (!application) return
+
+  emit("update-application-notes", {applicationId, newStatus})
+}
+
 function application_selected(application_id){
     selectedApplicationId.value = application_id
 }
@@ -138,7 +146,7 @@ function application_selected(application_id){
 </script>
 
 <style scoped>
-.holder {
+/* .holder {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -146,7 +154,14 @@ function application_selected(application_id){
   gap: 12px;
   background: #fafafa;
   margin: 20px;
+} */
+.holder {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .view-toolbar {
   display: flex;
@@ -167,19 +182,13 @@ function application_selected(application_id){
   border-color: #4f46e5;
 }
 
-/* .content-area {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  gap: 16px;
-} */
+
 
 .content-area {
-  display: flex;
   flex: 1;
   min-height: 0;
   min-width: 0;
-  gap: 16px;
   overflow: hidden;
+  display: flex;
 }
 </style>

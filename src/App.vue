@@ -53,6 +53,9 @@ const companies = ref([
       {id:"52", company: "Company 5",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
       {id:"53", company: "Company 5",position: "implementation", status: "offer", short_note: "short note", notes: "interview experiences"},
       {id:"54", company: "Company 5",position: "customer support", status: "in progress", short_note: "short note", notes: "interview experiences"},
+    ]},
+    {name: "Company 6", applications:[
+      {id:"61", company: "Company 6",position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
     ]}
 ])
 
