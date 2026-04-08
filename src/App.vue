@@ -33,20 +33,26 @@ const events = ref({
 
 const companies = ref([
     {name: "Company 1", applications:[
-      {id:"11", position: "backend engineer", status: "ready to apply", next_event: "2026-03-18 12:30:00" },
-      {id:"12", position: "frontend engineer", status: "applied", next_event: "2026-03-19 13:30:00" },
-      {id:"13", position: "fullstack engineer", status: "interview scheduled", next_event: "2026-03-20 14:30:00" },
+      {id:"11", company: "Company 1", position: "backend engineer", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
+      {id:"12", company: "Company 1", position: "frontend engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
+      {id:"13", company: "Company 1", position: "fullstack engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
     ]}, 
     {name: "Company 2", applications:[
-      {id:"21", position: "swe", status: "applied", next_event: "2026-03-11 11:30:00" },
-      {id:"22", position: "forward deployed engineer", status: "rejected", next_event: "2026-03-11 18:30:00" },
+      {id:"21", company: "Company 2", position: "swe", status: "archive", short_note: "short note", notes: "interview experiences"},
+      {id:"22", company: "Company 2", position: "forward deployed engineer", status: "reject", short_note: "short note", notes: "interview experiences"},
     ]}, 
     {name: "Company 3", applications:[
-      {id:"31", position: "dev rel", status: "interview scheduled", next_event: "2026-03-15 11:30:00" },
-      {id:"32", position: "customer support", status: "applied", next_event: "2026-03-15 11:30:00" },
+      {id:"31", company: "Company 3", position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
+      {id:"32", company: "Company 3", position: "customer support", status: "archive", short_note: "short note", notes: "interview experiences"},
     ]},
     {name: "Company 4", applications:[
-      {id:"41", position: "content writer", status: "accepted", next_event: "2026-03-15 11:30:00" },
+      {id:"41", company: "Company 4",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
+    ]},
+    {name: "Company 5", applications:[
+      {id:"51", company: "Company 5",position: "dev rel", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
+      {id:"52", company: "Company 5",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
+      {id:"53", company: "Company 5",position: "implementation", status: "offer", short_note: "short note", notes: "interview experiences"},
+      {id:"54", company: "Company 5",position: "customer support", status: "in progress", short_note: "short note", notes: "interview experiences"},
     ]}
 ])
 

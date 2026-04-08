@@ -74,7 +74,7 @@ function formatNextevent(date) {
 }
 
 function statusClass(status) {
-  return status.toLowerCase().replace(" ", "-")
+  return status.toLowerCase().replaceAll(" ", "-")
 }
 
 </script>
@@ -136,7 +136,7 @@ function statusClass(status) {
   color: white;
 }
 
-.status-pill.done {
+.status-pill.offer {
   background: #4caf50;
 }
 
@@ -144,7 +144,15 @@ function statusClass(status) {
   background: #ff9800;
 }
 
-.status-pill.todo {
-  background: #9e9e9e;
+.status-pill.reject {
+  background: #f7160e;
+}
+
+.status-pill.ready-to-apply {
+  background: #4b5dd0;
+}
+
+.status-pill.archive {
+  background: #5a5b63;
 }
 </style>

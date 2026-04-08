@@ -8,11 +8,12 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-   "dependencies": {
+  "dependencies": {
     "dompurify": "^3.3.1",
     "highlight.js": "^11.11.1",
     "marked": "^17.0.3",
-    "vue": "^3.5.29"
+    "vue": "^3.5.29",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.4",

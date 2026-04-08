@@ -29,26 +29,14 @@
       </div>
 
       <div class="field">
-        <label>Next event</label>
-        <input
-          type="datetime-local"
-          v-model="nextEvent"
-        />
-      </div>
-
-      <div class="field">
         <label>Status</label>
-        <select v-model="status">
-          <option disabled value="">Select status</option>
-          <option value="ready to apply">ready to apply</option>
-          <option value="applied">applied</option>
-          <option value="interview scheduled">interview scheduled</option>
-          <option value="rejected">rejected</option>
-          <option value="ghosted">ghosted</option>
-          <option value="offered">offered</option>
-          <option value="signed">signed</option>
-          <option value="archived">archived</option>
-        </select>
+          <select v-model="editedStatus">
+            <option value="ready to apply">ready to apply</option>
+            <option value="in progress">in progress</option>
+            <option value="reject">reject</option>
+            <option value="offer">offer</option>
+            <option value="archive">archive</option>
+          </select>
       </div>
 
       <div class="actions">
@@ -91,6 +79,10 @@ function addNewApplication() {
   nextEvent.value = ""
 
   open.value = false
+}
+
+function statusClass(status) {
+  return status.toLowerCase().replaceAll(" ", "-")
 }
 </script>
 

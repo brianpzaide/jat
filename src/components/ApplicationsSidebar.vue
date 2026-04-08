@@ -16,13 +16,10 @@
       <select placeholder="filter by status" v-model="statusFilter" class="status-filter">
         <option disabled value="">Filter by status</option>
         <option value="ready to apply">ready to apply</option>
-        <option value="applied">applied</option>
-        <option value="interview scheduled">interview scheduled</option>
-        <option value="rejected">rejected</option>
-        <option value="ghosted">ghosted</option>
-        <option value="offered">offered</option>
-        <option value="signed">signed</option>
-        <option value="archived">archived</option> 
+        <option value="in progress">in progress</option>
+        <option value="reject">reject</option>
+        <option value="offer">offere</option>
+        <option value="archive">archive</option> 
       </select>
     </div>
 

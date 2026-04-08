@@ -2,40 +2,42 @@
   <div class="application-details" v-if="application">
     <div class="header">
 
+      <div class="company-name">
+        {{ application.company }}
+      </div>
+
       <div class="position-name">
         {{ application.position }}
       </div>
 
-      <div class="next-event">
-        <template v-if="!editing">
-          {{ application.next_event }}
-        </template>
-
-        <template v-else>
-          <input
-            type="datetime-local"
-            v-model="editedNextEvent"
-          />
-        </template>
-      </div>
-
       <div class="application-status">
         <template v-if="!editing">
-          {{ application.status }}
+          <span
+              class="status-pill"
+              :class="statusClass(application.status)"
+            >{{ application.status }}
+          </span>
         </template>
 
-        <template v-else>
-          <select v-model="editedStatus">
-            <option value="ready to apply">ready to apply</option>
-            <option value="applied">applied</option>
-            <option value="interview scheduled">interview scheduled</option>
-            <option value="rejected">rejected</option>
-            <option value="ghosted">ghosted</option>
-            <option value="offered">offered</option>
-            <option value="signed">signed</option>
-            <option value="archived">archived</option>
+        <div v-else>
+          <select class="status-pill" v-model="editedStatus">
+            <option value="ready to apply">
+              ready to apply
+            </option>
+            <option value="in progress">
+              in progress
+            </option>
+            <option value="reject">
+              reject
+            </option>
+            <option value="offer">
+              offer
+            </option>
+            <option value="archive">
+              archive
+            </option>
           </select>
-        </template>
+        </div>
       </div>
 
       <div class="actions">
@@ -89,6 +91,12 @@ function updateApplication() {
 
   editing.value = false
 }
+
+
+function statusClass(status) {
+  return status.toLowerCase().replaceAll(" ", "-")
+}
+
 </script>
 
 <style scoped>
@@ -100,20 +108,50 @@ function updateApplication() {
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content:space-around;
+}
+
+.company-name {
+  font-weight: 600;
+  font-size: .95rem;
 }
 
 .position-name {
   font-weight: 600;
-}
-
-.next-event {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: .95rem;
 }
 
 .actions button {
   padding: 4px 10px;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  /* color: white; */
+  background-color: white;
+}
+
+.status-pill.offer {
+  background: #4caf50;
+}
+
+.status-pill.in-progress {
+  background: #ff9800;
+}
+
+.status-pill.reject {
+  background: #f7160e;
+}
+
+.status-pill.ready-to-apply {
+  background: #4b5dd0;
+}
+
+.status-pill.archive {
+  background: #5a5b63;
+  color: white;
 }
 
 </style>

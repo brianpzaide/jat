@@ -1,4 +1,4 @@
-<template>
+<!--<template>
   <div class="holder">
 
     <ApplicationsSidebar
@@ -14,18 +14,87 @@
     />
 
   </div>
+</template> -->
+
+
+
+<template>
+  <div class="holder">
+    <div class="view-toolbar">
+      <button
+        class="view-toggle"
+        :class="{ active: viewMode === 'list' }"
+        @click="viewMode = 'list'"
+      >
+        List
+      </button>
+
+      <button
+        class="view-toggle"
+        :class="{ active: viewMode === 'kanban' }"
+        @click="viewMode = 'kanban'"
+      >
+        Kanban
+      </button>
+    </div>
+
+    <div class="content-area">
+      <ApplicationsSidebar
+        v-if="viewMode === 'list'"
+        :companies="companies"
+        :activeApplicationId="selectedApplicationId"
+        @application-selected="application_selected"
+      />
+
+      <ApplicationMainPanel
+        v-if="viewMode === 'list'"
+        :application="selectedApplication"
+        @update-application-details="forwardDetailsUpdate"
+        @update-application-notes="forwardNotesUpdate"
+      />
+
+      <ApplicationsKanban
+        v-else
+        :applications="applications"
+        :activeApplicationId="selectedApplicationId"
+        @application-selected="application_selected"
+        @update-short-note="emit('update-short-note', $event)"
+        @update-application-notes="forwardNotesUpdate"
+      />
+    </div>
+  </div>
 </template>
+
+
+
+
+
+
+
 
 <script setup>
 
 import ApplicationsSidebar from "./ApplicationsSidebar.vue"
 import ApplicationMainPanel from "./ApplicationMainPanel.vue"
+import ApplicationsKanban from './ApplicationsKanban.vue'
 
 import { ref, computed } from "vue"
+
 
 const props = defineProps({
   companies: Array
 })
+
+
+const viewMode = ref('list')
+
+const applications = ref([])
+for (const company of props.companies){
+  (applications.value).push(...company.applications)
+}
+
+
+
 
 const emit = defineEmits(["update-application-details", "update-application-notes"])
 
@@ -71,13 +140,46 @@ function application_selected(application_id){
 <style scoped>
 .holder {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-
+  flex-direction: column;
+  height: 100%;
   padding: 16px;
-  gap: 16px;
-
+  gap: 12px;
   background: #fafafa;
   margin: 20px;
+}
+
+.view-toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.view-toggle {
+  border: 1px solid #d1d5db;
+  background: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.view-toggle.active {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+/* .content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 16px;
+} */
+
+.content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  gap: 16px;
+  overflow: hidden;
 }
 </style>
