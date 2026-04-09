@@ -54,12 +54,11 @@ function getApplicationsForColumn(columnKey) {
 <style scoped>
 .kanban-board {
   display: flex;
-  gap: 16px;
-  height: 100%;
-  min-height: 0;
+  gap: 8px;
+  height: 100vh;
   overflow-x: auto;
   overflow-y: hidden;
-  /* padding: 8px 4px 8px 0; */
+  padding: 8px;
 }
 
 </style>

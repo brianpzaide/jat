@@ -21,10 +21,10 @@
     <div class="short-note-row">
       <div class="short-note-content">
         <template v-if="editingShortNote">
-          <input
+          <textarea
             v-model="editableShortNote"
             class="short-note-input"
-            type="text"
+            type="textbox"
             placeholder="Add next step or reminder"
             @click.stop
           />
@@ -39,7 +39,7 @@
         class="short-note-action"
         @click.stop="toggleShortNoteEdit"
       >
-        {{ editingShortNote ? 'Save' : '✏️' }}
+        {{ editingShortNote ? '💾' : '✏️' }}
       </button>
     </div>
     <button
@@ -133,15 +133,15 @@
 <style scoped>
   .kanban-card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
+    border: 3px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     cursor: pointer;
-    min-height: 160px;
-    max-height: 160px;
+    height: 25vh;
+    width: 40vh;
     overflow: hidden;
     flex-shrink: 0;
   }
@@ -170,27 +170,34 @@
     display: flex;
     align-items: flex-start;
     gap: 8px;
+    height: 40%;
   }
 
   .short-note-content {
     flex: 1;
-    min-width: 0;
   }
 
   .short-note-text {
     font-size: 0.85rem;
     color: #6b7280;
-    line-height: 1.4;
+    line-height: 1.3;
+    overflow-x: auto;
     overflow-y: auto;
-    max-height: 48px;
+    height: 65px;
+    width: 200px;
     word-break: break-word;
   }
 
   .short-note-input {
-    width: 100%;
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.3;
+    height: 60px;
+    width: 200px;
+    overflow-x: auto;
+    overflow-y: auto;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    padding: 6px 8px;
     font-size: 0.85rem;
   }
 
