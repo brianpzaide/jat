@@ -56,10 +56,13 @@
       >
         <div class="dialog-panel">
           <div class="dialog-header">
-            <div>
-              <div class="dialog-company">{{ application.companyName }}</div>
-              <div class="dialog-position">{{ application.position }}</div>
-            </div>
+            <div class="dialog-company">{{ application.company }}</div>
+            <div class="dialog-position"><i>{{ application.position }}</i></div>
+            <div> <span
+              class="status-pill"
+              :class="statusClass(application.status)"
+            >{{ application.status }}
+          </span></div>
             <button
               class="dialog-close"
               @click="showNotesDialog = false"
@@ -242,7 +245,6 @@
   .dialog-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 16px;
     border-bottom: 1px solid #e5e7eb;
   }
@@ -253,7 +255,8 @@
 
   .dialog-position {
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
   }
 
   .dialog-close {
@@ -270,7 +273,7 @@
   }
 
   .status-pill {
-    font-size: 0.65rem;
+    font-size: 0.85rem;
     padding: 2px 8px;
     border-radius: 12px;
     color: white;

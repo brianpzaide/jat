@@ -85,14 +85,20 @@ function save() {
 
 <style scoped>
 .markdown-editor {
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  font-family: Arial, sans-serif;
+  height: 100%;
+  width: 100%;
+
   display: flex;
   flex-direction: column;
+
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+
+  overflow: hidden;
 }
 
 .toolbar {
+  flex-shrink: 0;
   display: flex;
   gap: 8px;
   padding: 8px;
@@ -113,17 +119,25 @@ function save() {
 }
 
 .editor-container {
-  height: 500px;
+  flex: 1;
+  min-height: 0;
   padding: 12px;
+  display: flex;
   overflow: hidden;
 }
 
 .editor {
+  flex: 1;
+  min-height: 0;
+
   width: 100%;
   height: 100%;
+
   border: none;
-  resize: none;
   outline: none;
+  resize: none;
+
+  padding: 12px;
   font-family: monospace;
   line-height: 1.5;
 
