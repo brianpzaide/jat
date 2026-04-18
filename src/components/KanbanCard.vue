@@ -56,13 +56,17 @@
       >
         <div class="dialog-panel">
           <div class="dialog-header">
-            <div class="dialog-company">{{ application.company }}</div>
-            <div class="dialog-position"><i>{{ application.position }}</i></div>
-            <div> <span
-              class="status-pill"
-              :class="statusClass(application.status)"
-            >{{ application.status }}
-          </span></div>
+            <div class="application-details">
+              <div class="dialog-company">{{ application.company }}</div>
+              <div class="dialog-position">
+                <i style="margin-right: 8px">{{ application.position }}</i>
+                <span
+                  class="status-pill"
+                  :class="statusClass(application.status)"
+                >{{ application.status }}
+                </span>
+              </div>
+            </div>
             <button
               class="dialog-close"
               @click="showNotesDialog = false"
