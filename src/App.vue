@@ -1,6 +1,9 @@
 <template>
 
-  <NewJobApplication/>
+  <NewJobApplication
+  :applicationStatusOptions="applicationStatusOptions"
+  @add-new-application="addNewJobApplication"
+  />
 
   <EventHeatmap
     :events="events"
@@ -9,7 +12,10 @@
   />
 
   <ApplicationsHolder
-  :companies="companies"
+  :companies="companies_prop"
+  :applicationStatusOptions="applicationStatusOptions"
+  @filter-by-company="filterApplicationsByCompany"
+  @filter-by-status="filterApplicationsByStatus"
   />
 </template>
 
@@ -19,6 +25,8 @@ import EventHeatmap from './components/EventHeatmap.vue'
 import ApplicationsHolder from './components/ApplicationsHolder.vue'
 
 import { ref } from "vue"
+
+const applicationStatusOptions = ref(["ready to apply", "in progress", "offer", "reject", "archive"])
 
 const events = ref({
   "2026-03-05": [
@@ -59,13 +67,76 @@ const companies = ref([
     ]}
 ])
 
+const companies_prop = ref([])
+companies_prop.value = [...companies.value]
+
+
+
+
 function openDialog(date) {
   console.log("open dialog for", date)
 }
 
-function handleSave(content) {
-  console.log('Saved content:', content)
+function addNewJobApplication(newJobApplication) {
+  const idx = companies.value.findIndex(company => company.name === newJobApplication.companyName)
+  if (idx !== -1){
+    const n = companies.value[idx].applications.length
+    companies.value[idx].applications.push({
+      id: newJobApplication.companyName+n,
+      company: newJobApplication.companyName,
+      position: newJobApplication.position,
+      status: newJobApplication.status,
+      short_note: "short note",
+      notes: "interview experiences"
+    })
+  }else{
+    companies.value.push({
+      name: newJobApplication.companyName,
+      applications: [{
+        id: newJobApplication.companyName+1,
+        company: newJobApplication.companyName,
+        position: newJobApplication.position,
+        status: newJobApplication.status,
+        short_note: "short note",
+        notes: "interview experiences"
+      }]
+    })    
+  }
 }
+
+function filterApplicationsByCompany(companyName) {
+  if (companyName === "") {
+    companies_prop.value = [...companies.value]
+    return
+  }
+
+  const company = companies.value.find(c => c.name === companyName)
+
+  companies_prop.value = company ? [company] : []
+}
+
+function filterApplicationsByStatus(applicationStatus) {
+  if (applicationStatus === "") {
+    companies_prop.value = [...companies.value]
+    return
+  }
+
+  companies_prop.value = []
+
+  for (let c of companies.value) {
+    const applications = c.applications.filter(
+      app => app.status === applicationStatus
+    )
+
+    if (applications.length > 0) {
+      companies_prop.value.push({
+        name: c.name,
+        applications
+      })
+    }
+  }
+}
+
 </script>
 
 <style>

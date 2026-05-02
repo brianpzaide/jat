@@ -29,10 +29,6 @@
                     {{ application.status }}
                 </span>
             </div>
-
-            <div class="nextevent">
-              {{ formatNextevent(application.next_event) }}
-            </div>
         </div>
     </div>
 </template>
@@ -43,13 +39,12 @@ import { computed, reactive, ref } from "vue"
 
 const props = defineProps({
   /*
-  applications format example:
-
+  applications example:
   {
     name: "company_name",
     applications: [
-        {id:"<application_id>", position: "<application_position>", status: "<application_status>", next_event: "<next_event>" },
-        {id:"<application_id>", position: "<application_position>", status: "<application_status>", next_event: "<next_event>" }
+        {id:"<application_id>", company: <company_name>, position: "<application_position>", status: "<application_status>", short_note: "<short_note>", notes: "<notes>""},
+        {id:"<application_id>", company: <company_name>, position: "<application_position>", status: "<application_status>", short_note: "<short_note>", notes: "<notes>""}
     ]
   }
   */

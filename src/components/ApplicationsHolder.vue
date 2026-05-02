@@ -42,6 +42,7 @@
       <ApplicationsSidebar
         v-if="viewMode === 'list'"
         :companies="companies"
+        :applicationStatusOptions="applicationStatusOptions"
         :activeApplicationId="selectedApplicationId"
         @application-selected="application_selected"
       />
@@ -49,6 +50,7 @@
       <ApplicationMainPanel
         v-if="viewMode === 'list'"
         :application="selectedApplication"
+        :applicationStatusOptions="applicationStatusOptions"
         @update-application-details="forwardDetailsUpdate"
         @update-application-notes="forwardNotesUpdate"
       />
@@ -83,7 +85,12 @@ import { ref, computed } from "vue"
 
 
 const props = defineProps({
-  companies: Array
+  companies: {
+    type: Array
+  },
+  applicationStatusOptions: {
+    type: Array,
+  },
 })
 
 
@@ -166,6 +173,7 @@ function application_selected(application_id){
 .view-toolbar {
   display: flex;
   gap: 8px;
+  margin-left: 12px;
 }
 
 .view-toggle {

@@ -15,11 +15,10 @@
 
       <select placeholder="filter by status" v-model="statusFilter" class="status-filter">
         <option disabled value="">Filter by status</option>
-        <option value="ready to apply">ready to apply</option>
-        <option value="in progress">in progress</option>
-        <option value="reject">reject</option>
-        <option value="offer">offere</option>
-        <option value="archive">archive</option> 
+        <option 
+          v-for="status in applicationStatusOptions"
+          :key="status"
+          :value="status">{{status}}</option>        
       </select>
     </div>
 
@@ -49,7 +48,10 @@ const props = defineProps({
   activeApplicationId: {
     type: Number,
     required: true
-  }
+  },
+  applicationStatusOptions: {
+    type: Array,
+  },
 })
 
 const nameFilter = ref("")

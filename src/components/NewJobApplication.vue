@@ -1,15 +1,11 @@
 <template>
 <div class="new-application">
-
-    <!-- Collapsible Header -->
     <div class="header" @click="toggle">
       <span>Add new application</span>
       <span class="arrow">{{ open ? "▲" : "▼" }}</span>
     </div>
 
-    <!-- Form -->
     <div v-if="open" class="form">
-
       <div class="field">
         <label>Company name</label>
         <input
@@ -30,21 +26,17 @@
 
       <div class="field">
         <label>Status</label>
-          <select v-model="editedStatus">
-            <option value="ready to apply">ready to apply</option>
-            <option value="in progress">in progress</option>
-            <option value="reject">reject</option>
-            <option value="offer">offer</option>
-            <option value="archive">archive</option>
+          <select v-model="status">
+            <option 
+              v-for="option in applicationStatusOptions"
+              :key="option"
+              :value="option">{{option}}</option>
           </select>
       </div>
-
       <div class="actions">
         <button @click="addNewApplication">Add</button>
       </div>
-
     </div>
-
   </div>
   
 </template>
@@ -59,7 +51,12 @@ const open = ref(false)
 const companyName = ref("")
 const position = ref("")
 const status = ref("")
-const nextEvent = ref("")
+
+const props = defineProps({
+  applicationStatusOptions: {
+    type: Array,
+  },
+})
 
 function toggle() {
   open.value = !open.value
@@ -70,20 +67,15 @@ function addNewApplication() {
     companyName: companyName.value.trim(),
     position: position.value.trim(),
     status: status.value,
-    nextEvent: nextEvent.value
   })
 
   companyName.value = ""
   position.value = ""
   status.value = ""
-  nextEvent.value = ""
 
   open.value = false
 }
 
-function statusClass(status) {
-  return status.toLowerCase().replaceAll(" ", "-")
-}
 </script>
 
 <style scoped>

@@ -3,6 +3,7 @@
     <div class="details-container">
       <ApplicationDetails
         :application="application"
+        :applicationStatusOptions="applicationStatusOptions"
         @update-application-details="emit('update-application-details', $event)"
       />
     </div>
@@ -22,8 +23,14 @@ import ApplicationDetails from "./ApplicationDetails.vue"
 import ApplicationNotes from "./ApplicationNotes.vue"
 
 const props = defineProps({
-  application: Object
+  application: {
+    type: Object
+  },
+  applicationStatusOptions: {
+    type: Array,
+  },
 })
+
 
 const emit = defineEmits(["update-application-details", "update-application-notes"])
 
@@ -46,9 +53,7 @@ const emit = defineEmits(["update-application-details", "update-application-note
 }
 
 .notes-container {
-  width: 100%;
-  min-height: 0;
+    width: min(1000px, 92vw);
+    height: min(800px, 90vh);
 }
-
-
 </style>

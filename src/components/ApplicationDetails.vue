@@ -20,22 +20,11 @@
         </template>
 
         <div v-else>
-          <select class="status-pill" v-model="editedStatus">
-            <option value="ready to apply">
-              ready to apply
-            </option>
-            <option value="in progress">
-              in progress
-            </option>
-            <option value="reject">
-              reject
-            </option>
-            <option value="offer">
-              offer
-            </option>
-            <option value="archive">
-              archive
-            </option>
+          <select v-model="editedStatus">
+            <option 
+              v-for="status in applicationStatusOptions"
+              :key="status"
+              :value="status">{{status}}</option>
           </select>
         </div>
       </div>
@@ -58,7 +47,12 @@
 import { ref, watch } from "vue"
 
 const props = defineProps({
-  application: Object
+  application: {
+    type: Object
+  },
+  applicationStatusOptions: {
+    type: Array,
+  },  
 })
 
 const emit = defineEmits(["update-application-details"])
