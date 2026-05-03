@@ -1,7 +1,7 @@
 <template>
   <div class="kanban-column">
     <div class="column-header">
-      <h3>{{ label }}</h3>
+      <h3>{{ getLabel(statusKey) }}</h3>
       <span class="column-count">{{ applications.length }}</span>
     </div>
 
@@ -16,9 +16,9 @@
         <KanbanCard
           :application="element"
           :active="element.id === activeApplicationId"
-          @select="emit('application-selected', element.id)"
-          @update-short-note="emit('update-short-note', $event)"
-          @update-application-notes="emit('update-application-notes', $event)"
+          @application-selected="forwardApplicationSelected"
+          @update-short-note="forwardUpdateShortNote"
+          @update-application-notes="forwardUpdateApplicationNotes"
         />
       </template>
     </draggable>
@@ -32,10 +32,10 @@ import KanbanCard from './KanbanCard.vue'
 import draggable from 'vuedraggable'
 
 const props = defineProps({
-  label: {
-    type: String,
-    required: true
-  },
+  // label: {
+  //   type: String,
+  //   required: true
+  // },
   statusKey: {
     type: String,
     required: true
@@ -67,12 +67,31 @@ const emit = defineEmits([
   'application-moved'
 ])
 
+function getLabel(str) {
+  return str
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function forwardApplicationSelected(payload){
+  emit('application-selected', payload)
+}
+
+function forwardUpdateShortNote(payload){
+  emit('update-short-note', payload)
+}
+
+function forwardUpdateApplicationNotes(payload){
+  emit('update-application-notes', payload)
+}
+
 function handleDragChange(event){
   if (!event.added) return
   const application = event.added.element
   emit('application-moved', {
     applicationId: application.id,
-    newStatus: props.statusKey
+    status: props.statusKey
   })
 }
 

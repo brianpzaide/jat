@@ -4,13 +4,13 @@
       <ApplicationDetails
         :application="application"
         :applicationStatusOptions="applicationStatusOptions"
-        @update-application-details="emit('update-application-details', $event)"
+        @update-application-status="forwardUpdateApplicationStatus"
       />
     </div>
     <div class="notes-container">
       <ApplicationNotes
         :application="application"
-        @update-application-notes="emit('update-application-notes', $event)"
+        @update-application-notes="forwardUpdateApplicationNotes"
       />
     </div>
 
@@ -32,7 +32,16 @@ const props = defineProps({
 })
 
 
-const emit = defineEmits(["update-application-details", "update-application-notes"])
+const emit = defineEmits(["update-application-status", "update-application-notes"])
+
+function forwardUpdateApplicationStatus(payload) {
+  emit("update-application-status", payload)
+}
+
+function forwardUpdateApplicationNotes(payload) {
+  emit("update-application-notes", payload)
+}
+
 
 </script>
 

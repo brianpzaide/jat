@@ -3,7 +3,7 @@
     <div class="filter-card">
       <div class="search-wrapper">
         <input
-          v-model="companyQuery"
+          v-model="nameFilter"
           type="text"
           placeholder="Search company..."
           class="search-input"
@@ -57,19 +57,19 @@ const props = defineProps({
 const nameFilter = ref("")
 const statusFilter = ref("")
 
-const emit = defineEmits(['application-selected', 'filter-company-by-name', 'filter-company-by-status'])
+const emit = defineEmits(['application-selected', 'filter-by-company', 'filter-by-status'])
 
 function forwardApplicationSelected(application_id){
     emit("application-selected", application_id)
 }
 
 function applyNameFilter() {
-  const companyName = nameFilter.value.trim().toLowerCase()
-  emit("filter-company-by-name", companyName)
+  // const companyName = nameFilter.value.trim().toLowerCase()
+  emit("filter-by-company", nameFilter.value.trim().toLowerCase())
 }
 
 watch(statusFilter, (status) => {
-    emit("filter-company-by-status", status)
+    emit("filter-by-status", status)
 })
 
 </script>

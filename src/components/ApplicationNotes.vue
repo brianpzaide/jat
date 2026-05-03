@@ -52,7 +52,7 @@ watch(
 )
 
 
-const isPreview = ref(false)
+const isPreview = ref(true)
 const textarea = ref(null)
 
 marked.setOptions({
@@ -77,9 +77,10 @@ const emit = defineEmits(['update-application-notes'])
 
 function save() {
   emit('update-application-notes', {
-  applicationId: props.application.id,
-  notes: content.value
-})
+    applicationId: props.application.id,
+    notes: content.value
+  })
+  isPreview.value = true
 }
 </script>
 

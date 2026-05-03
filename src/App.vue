@@ -16,6 +16,9 @@
   :applicationStatusOptions="applicationStatusOptions"
   @filter-by-company="filterApplicationsByCompany"
   @filter-by-status="filterApplicationsByStatus"
+  @update-application-status="updateApplicationStatus"
+  @update-short-note="updateShortNote"
+  @update-application-notes="updateApplicationNotes"
   />
 </template>
 
@@ -68,7 +71,7 @@ const companies = ref([
 ])
 
 const companies_prop = ref([])
-companies_prop.value = [...companies.value]
+companies_prop.value = companies.value
 
 
 
@@ -102,22 +105,25 @@ function addNewJobApplication(newJobApplication) {
       }]
     })    
   }
+  companies_prop.value = [...companies.value]
 }
 
 function filterApplicationsByCompany(companyName) {
   if (companyName === "") {
-    companies_prop.value = [...companies.value]
+    companies_prop.value = []
+    companies_prop.value = companies.value
     return
   }
 
-  const company = companies.value.find(c => c.name === companyName)
-
+  const company = companies.value.find(c => c.name.trim().toLowerCase() === companyName)
+  companies_prop.value = []
   companies_prop.value = company ? [company] : []
 }
 
 function filterApplicationsByStatus(applicationStatus) {
   if (applicationStatus === "") {
-    companies_prop.value = [...companies.value]
+    companies_prop.value = []
+    companies_prop.value = companies.value
     return
   }
 
@@ -137,6 +143,47 @@ function filterApplicationsByStatus(applicationStatus) {
   }
 }
 
+function updateApplicationStatus(payload) {
+  let comp_idx = 0
+  for (let c of companies.value) {
+    const app_idx = c.applications.findIndex(
+      app => app.id === payload.applicationId
+    )
+    if (app_idx !== -1) {
+      companies.value[comp_idx].applications[app_idx].status = payload.status
+      return
+    }
+    comp_idx += 1
+  }
+}
+
+function updateShortNote(payload) {
+  let comp_idx = 0
+  for (let c of companies.value) {
+    const app_idx = c.applications.findIndex(
+      app => app.id === payload.applicationId
+    )
+    if (app_idx !== -1) {
+      companies.value[comp_idx].applications[app_idx].short_note = payload.shortNote
+      return
+    }
+    comp_idx += 1
+  }
+}
+
+function updateApplicationNotes(payload) {
+  let comp_idx = 0
+  for (let c of companies.value) {
+    const app_idx = c.applications.findIndex(
+      app => app.id === payload.applicationId
+    )
+    if (app_idx !== -1) {
+      companies.value[comp_idx].applications[app_idx].notes = payload.notes
+      return
+    }
+    comp_idx += 1
+  }
+}
 </script>
 
 <style>

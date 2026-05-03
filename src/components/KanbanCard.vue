@@ -2,9 +2,7 @@
   <div
     class="kanban-card"
     :class="{ active }"
-    @click="emit('select', {
-      applicationId: application.id
-    })"
+    @click="emit('application-selected', application.id)"
   >
     <div class="card-company">
       <span>{{ application.company }}</span>
@@ -77,7 +75,7 @@
           <div class="dialog-body">
             <ApplicationNotes
               :application="application"
-              @update-application-notes="emit('update-application-notes', $event)"
+              @update-application-notes="forwardUpdateApplicationNotes"
             />
           </div>
         </div>
@@ -103,7 +101,7 @@
     })
 
     const emit = defineEmits([
-      'select', 
+      'application-selected', 
       'update-short-note',
       'update-application-notes'
     ])
@@ -132,6 +130,10 @@
 
   function statusClass(status) {
     return status.toLowerCase().replaceAll(" ", "-")
+  }
+
+  function forwardUpdateApplicationNotes(payload){
+    emit('update-application-notes', payload)
   }
 
 

@@ -1,23 +1,3 @@
-<!--<template>
-  <div class="holder">
-
-    <ApplicationsSidebar
-      :companies="companies"
-      :activeApplicationId="selectedApplicationId"
-      @application-selected="application_selected"
-    />
-
-    <ApplicationMainPanel
-      :application="selectedApplication"
-      @update-application-details="forwardDetailsUpdate"
-      @update-application-notes="forwardNotesUpdate"
-    />
-
-  </div>
-</template> -->
-
-
-
 <template>
   <div class="holder">
     <div class="view-toolbar">
@@ -45,35 +25,31 @@
         :applicationStatusOptions="applicationStatusOptions"
         :activeApplicationId="selectedApplicationId"
         @application-selected="application_selected"
+        @filter-by-company="forwardFilterByCompany"
+        @filter-by-status="forwardFilterByStatus"
       />
 
       <ApplicationMainPanel
         v-if="viewMode === 'list'"
         :application="selectedApplication"
         :applicationStatusOptions="applicationStatusOptions"
-        @update-application-details="forwardDetailsUpdate"
+        @update-application-status="forwardStatusUpdate"
         @update-application-notes="forwardNotesUpdate"
       />
 
       <ApplicationsKanban
         v-else
         :applications="applications"
+        :applicationStatusOptions="applicationStatusOptions"
         :activeApplicationId="selectedApplicationId"
         @application-selected="application_selected"
-        @update-short-note="emit('update-short-note', $event)"
-        @update-application-notes="forwardNotesUpdate"
-        @application-moved="forwardApplicationMoved"
+        @update-short-note="forwardUpdateShortNote"
+        @update-application-notes="forwardUpdateNotes"
+        @update-application-status="forwardUpdateApplicationStatus"
       />
     </div>
   </div>
 </template>
-
-
-
-
-
-
-
 
 <script setup>
 
@@ -81,7 +57,7 @@ import ApplicationsSidebar from "./ApplicationsSidebar.vue"
 import ApplicationMainPanel from "./ApplicationMainPanel.vue"
 import ApplicationsKanban from './ApplicationsKanban.vue'
 
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 
 
 const props = defineProps({
@@ -101,29 +77,26 @@ for (const company of props.companies){
   (applications.value).push(...company.applications)
 }
 
+watch(
+  () => props.companies,
+  value => {
+    applications.value = []
+    for (const company of value){
+      (applications.value).push(...company.applications)
+    }
+  },
+  {immediate: true}
+)
 
 
-
-const emit = defineEmits(["update-application-details", "update-application-notes"])
+const emit = defineEmits([
+  "filter-by-company",
+  "filter-by-status",
+  "update-application-status",
+  "update-application-notes",
+  ])
 
 const selectedApplicationId = ref(null)
-
-// const companies = ref(
-//   [
-//     {name: "1", applications:[
-//       {id:"11", position: "backend engineer", status: "ready to apply", next_event: "2026-03-18 12:30:00" },
-//       {id:"12", position: "frontend engineer", status: "applied", next_event: "2026-03-19 13:30:00" },
-//       {id:"13", position: "fullstack engineer", status: "interview scheduled", next_event: "2026-03-20 14:30:00" },
-//     ]}, 
-//     {name: "2", applications:[
-//       {id:"21", position: "swe", status: "applied", next_event: "2026-03-11 11:30:00" },
-//       {id:"22", position: "forward deployed engineer", status: "rejected", next_event: "2026-03-11 18:30:00" },
-//     ]}, 
-//     {name: "3", applications:[
-//       {id:"31", position: "dev rel", status: "interview scheduled", next_event: "2026-03-15 11:30:00" },
-//     ]}
-//   ]
-// )
 
 const selectedApplication = computed(() =>
   props.companies
@@ -131,19 +104,32 @@ const selectedApplication = computed(() =>
     .find(a => a.id === selectedApplicationId.value)
 )
 
-function forwardDetailsUpdate(payload) {
+function forwardFilterByCompany(payload) {
+  emit("filter-by-company", payload)
+}
+
+function forwardFilterByStatus(payload) {
+  emit("filter-by-status", payload)
+}
+
+function forwardStatusUpdate(payload) {
+  console.log("from ApplicationsHolder", payload)
   emit("update-application-status", payload)
 }
 
-function forwardNotesUpdate(payload) {
+function forwardUpdateShortNote(payload) {
+  console.log("from ApplicationsHolder", payload)
+  emit("update-short-note", payload)
+}
+
+function forwardUpdateNotes(payload) {
+  console.log("from ApplicationsHolder", payload)
   emit("update-application-notes", payload)
 }
 
-function forwardApplicationMoved({applicationId, newStatus}) {
-  const application = applications.value.find(app => app.id === applicationId)
-  if (!application) return
+function forwardUpdateApplicationStatus(payload) {
 
-  emit("update-application-notes", {applicationId, newStatus})
+  emit("update-application-status", payload)
 }
 
 function application_selected(application_id){

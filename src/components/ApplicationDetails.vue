@@ -34,7 +34,7 @@
           Edit
         </button>
 
-        <button v-else @click="updateApplication">
+        <button v-else @click="updateApplicationStatus">
           Update
         </button>
       </div>
@@ -55,18 +55,16 @@ const props = defineProps({
   },  
 })
 
-const emit = defineEmits(["update-application-details"])
+const emit = defineEmits(["update-application-status"])
 
 const editing = ref(false)
 const editedStatus = ref("")
-const editedNextEvent = ref("")
 
 watch(
   () => props.application,
   (application) => {
     if (application) {
       editedStatus.value = application.status
-      editedNextEvent.value = application.next_event
     }
   },
   { immediate: true }
@@ -76,11 +74,10 @@ function startEdit() {
   editing.value = true
 }
 
-function updateApplication() {
-  emit("update-application-details", {
+function updateApplicationStatus() {
+  emit("update-application-status", {
     applicationId: props.application.id,
     status: editedStatus.value,
-    next_event: editedNextEvent.value
   })
 
   editing.value = false
