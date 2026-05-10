@@ -110,6 +110,7 @@ function handleDragChange(event){
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
+  overscroll-behavior: contain;
 }
 
 

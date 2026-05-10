@@ -6,9 +6,10 @@
   />
 
   <EventHeatmap
-    :events="events"
+    :jatEvents="jatEvents"
     :year="2026"
-    @day-click="openDialog"
+    @add-event="addEvent"
+    @delete-event="deleteEvent"
   />
 
   <ApplicationsHolder
@@ -31,14 +32,13 @@ import { ref } from "vue"
 
 const applicationStatusOptions = ref(["ready to apply", "in progress", "offer", "reject", "archive"])
 
-const events = ref({
+const jatEvents = ref({
   "2026-03-05": [
-    { time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss. Meeting with boss. Meeting with boss. Meeting with boss." },
-    { time: "14:00 - 15:00", title: "Webinar on topic. Webinar on topic. Webinar on topic. Webinar on topic. Webinar on topic" }
+    { time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss." }
   ],
 
   "2026-03-10": [
-    { time: "09:00 - 10:00", title: "Standup meeting. Standup meeting. Standup meeting. Standup meeting. Standup meeting." }
+    { time: "09:00 - 10:00", title: "Standup meeting." }
   ]
 })
 
@@ -73,14 +73,34 @@ const companies = ref([
 const companies_prop = ref([])
 companies_prop.value = companies.value
 
-
-
-
-function openDialog(date) {
-  console.log("open dialog for", date)
+function addEvent(payload) {
+  if (payload.date.trim() === "" || payload.time.trim() === "" || payload.title.trim() === "") return
+  let tempEvents =  jatEvents.value[payload.date.trim()]
+  if (tempEvents){
+    jatEvents.value[payload.date.trim()].push({
+      time: payload.time.trim(), 
+      title: payload.title.trim()
+    })
+  }else{
+      jatEvents.value[payload.date.trim()] =[{
+        time: payload.time.trim(), 
+        title: payload.title.trim() 
+      }]
+  }
+  console.log(payload)
+}
+function deleteEvent(payload) {
+  if (payload.date.trim() === "" || payload.time.trim() === "") return
+  let tempEvents =  jatEvents.value[payload.date.trim()]
+  if (tempEvents){
+    const idx = jatEvents.value[payload.date.trim()].findIndex(e => e.time === payload.time.trim())
+    jatEvents.value[payload.date.trim()].splice(idx, 1)
+  }
+  console.log(payload)
 }
 
 function addNewJobApplication(newJobApplication) {
+  if (newJobApplication.companyName.trim() === "" || newJobApplication.position.trim() === "" || newJobApplication.status.trim() === "") return
   const idx = companies.value.findIndex(company => company.name === newJobApplication.companyName)
   if (idx !== -1){
     const n = companies.value[idx].applications.length

@@ -61,10 +61,50 @@
         <button @click="addEvent">Add Event</button>
         <button @click="dialog.visible = false">Cancel</button>
       </div>
+
+      <!-- <div class="event-list"
+        v-for="e in jatEvents[dialog.date]"
+        :key="e.time"
+        @click="deleteEvent(dialog.date, e.time)"
+        >
+        {{e.time + ": " + e.title}}
+      </div>    -->
+
+      <div
+        v-if="jatEvents[dialog.date]?.length"
+        class="event-list"
+      >
+        <div
+          v-for="e in jatEvents[dialog.date]"
+          :key="e.time"
+          class="event-item"
+        >
+          <button
+            class="delete-btn"
+            @click.stop="deleteEvent(dialog.date, e.time)"
+          >
+            ×
+          </button>
+
+          <div class="event-time">
+            {{ e.time }}
+          </div>
+
+          <div class="event-title">
+            {{ e.title }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else
+        class="no-events"
+      >
+        No events for this date
+      </div>
+
     </div>
   </div>
-
-
 </template>
 
 <script setup>
@@ -86,7 +126,7 @@ const props = defineProps({
     ]
   }
   */
-  events: {
+  jatEvents: {
     type: Object,
     default: () => ({})
   }
@@ -99,7 +139,7 @@ const dialog = reactive({
   title: ""
 })
 
-const emit = defineEmits(["add-event"])
+const emit = defineEmits(["add-event", "delete-event"])
 
 const monthNames = [
   "Jan","Feb","Mar","Apr","May","Jun",
@@ -133,7 +173,7 @@ const months = computed(() => {
       days.push({
         date: key,
         weekday: date.getDay(),
-        events: props.events[key] || []
+        events: props.jatEvents[key] || []
       })
     }
 
@@ -195,6 +235,14 @@ function addEvent() {
   })
 
   dialog.visible = false
+}
+
+function deleteEvent(eDate, eTime) {
+  if (!eDate || !eTime) return
+  emit("delete-event", {
+    date: eDate,
+    time: eTime
+  })
 }
 
 </script>
@@ -342,5 +390,81 @@ function addEvent() {
 
 .dialog-actions button:hover {
   background: #eaeaea;
+}
+
+
+
+.event-list {
+  max-height: 220px;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+
+  padding: 8px;
+}
+
+.event-item {
+  position: relative;
+
+  padding: 10px 12px;
+  padding-right: 32px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+
+  background: #f9fafb;
+}
+
+.event-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.event-title {
+  font-size: 13px;
+  color: #222;
+
+  margin-top: 4px;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  width: 20px;
+  height: 20px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+  color: #888;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.delete-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.no-events {
+  font-size: 13px;
+  color: #777;
+  text-align: center;
+  padding: 10px 0;
 }
 </style>

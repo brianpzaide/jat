@@ -35,7 +35,7 @@ const emit = defineEmits([
   'application-selected',
   'update-short-note',
   'update-application-notes',
-  'application-moved'
+  'update-application-status'
 ])
 
 // const columns = [

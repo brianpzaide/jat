@@ -34,7 +34,7 @@
         :application="selectedApplication"
         :applicationStatusOptions="applicationStatusOptions"
         @update-application-status="forwardStatusUpdate"
-        @update-application-notes="forwardNotesUpdate"
+        @update-application-notes="forwardUpdateNotes"
       />
 
       <ApplicationsKanban
