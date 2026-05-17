@@ -1,26 +1,41 @@
 <template>
+  <div class="startup" v-if="initial">
+    <input
+      type="file"
+      accept=".sqlite,.db"
+      @change="databaseSelected"
+    />
+    <button @click="createFreshDatabase">
+      Start Empty
+    </button>
+  </div>
 
-  <NewJobApplication
-  :applicationStatusOptions="applicationStatusOptions"
-  @add-new-application="addNewJobApplication"
-  />
+  <div v-else>
+    <button @click="exportDatabase">
+      Download database
+    </button>
+    <NewJobApplication
+      :applicationStatusOptions="applicationStatusOptions"
+      @add-new-application="addNewJobApplication"
+    />
 
-  <EventHeatmap
-    :jatEvents="jatEvents"
-    :year="2026"
-    @add-event="addEvent"
-    @delete-event="deleteEvent"
-  />
+    <EventHeatmap
+      :jatEvents="jatEvents"
+      :year="2026"
+      @add-event="addEvent"
+      @delete-event="deleteEvent"
+    />
 
-  <ApplicationsHolder
-  :companies="companies_prop"
-  :applicationStatusOptions="applicationStatusOptions"
-  @filter-by-company="filterApplicationsByCompany"
-  @filter-by-status="filterApplicationsByStatus"
-  @update-application-status="updateApplicationStatus"
-  @update-short-note="updateShortNote"
-  @update-application-notes="updateApplicationNotes"
-  />
+    <ApplicationsHolder
+      :companies="companies_prop"
+      :applicationStatusOptions="applicationStatusOptions"
+      @filter-by-company="filterApplicationsByCompany"
+      @filter-by-status="filterApplicationsByStatus"
+      @update-application-status="updateApplicationStatus"
+      @update-short-note="updateShortNote"
+      @update-application-notes="updateApplicationNotes"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -28,52 +43,90 @@ import NewJobApplication from './components/NewJobApplication.vue'
 import EventHeatmap from './components/EventHeatmap.vue'
 import ApplicationsHolder from './components/ApplicationsHolder.vue'
 
+import {
+  loadDatabaseFromFile,
+  createEmptyDatabase,
+  createApplication,
+  listApplications,
+  addJATEvent, 
+  deleteJATEvent,
+  getDB,
+  listAllEvents,
+  updateStatus,
+  updateNotes,
+  updateShortNotes
+} from "./db/db"
+
+
+
 import { ref } from "vue"
+
+const initial = ref(true)
 
 const applicationStatusOptions = ref(["ready to apply", "in progress", "offer", "reject", "archive"])
 
-const jatEvents = ref({
-  "2026-03-05": [
-    { time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss." }
-  ],
-
-  "2026-03-10": [
-    { time: "09:00 - 10:00", title: "Standup meeting." }
-  ]
-})
-
-const companies = ref([
-    {name: "Company 1", applications:[
-      {id:"11", company: "Company 1", position: "backend engineer", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
-      {id:"12", company: "Company 1", position: "frontend engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
-      {id:"13", company: "Company 1", position: "fullstack engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
-    ]}, 
-    {name: "Company 2", applications:[
-      {id:"21", company: "Company 2", position: "swe", status: "archive", short_note: "short note", notes: "interview experiences"},
-      {id:"22", company: "Company 2", position: "forward deployed engineer", status: "reject", short_note: "short note", notes: "interview experiences"},
-    ]}, 
-    {name: "Company 3", applications:[
-      {id:"31", company: "Company 3", position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
-      {id:"32", company: "Company 3", position: "customer support", status: "archive", short_note: "short note", notes: "interview experiences"},
-    ]},
-    {name: "Company 4", applications:[
-      {id:"41", company: "Company 4",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
-    ]},
-    {name: "Company 5", applications:[
-      {id:"51", company: "Company 5",position: "dev rel", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
-      {id:"52", company: "Company 5",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
-      {id:"53", company: "Company 5",position: "implementation", status: "offer", short_note: "short note", notes: "interview experiences"},
-      {id:"54", company: "Company 5",position: "customer support", status: "in progress", short_note: "short note", notes: "interview experiences"},
-    ]},
-    {name: "Company 6", applications:[
-      {id:"61", company: "Company 6",position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
-    ]}
-])
-
+const companies = ref([])
 const companies_prop = ref([])
-companies_prop.value = companies.value
+const jatEvents = ref({})
 
-function addEvent(payload) {
+
+// const jatEvents = ref({
+//   "2026-03-05": [
+//     { time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss." }
+//   ],
+
+//   "2026-03-10": [
+//     { time: "09:00 - 10:00", title: "Standup meeting." }
+//   ]
+// })
+
+// const companies = ref([
+//     {name: "Company 1", applications:[
+//       {id:"11", company: "Company 1", position: "backend engineer", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
+//       {id:"12", company: "Company 1", position: "frontend engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
+//       {id:"13", company: "Company 1", position: "fullstack engineer", status: "in progress", short_note: "short note", notes: "interview experiences"},
+//     ]}, 
+//     {name: "Company 2", applications:[
+//       {id:"21", company: "Company 2", position: "swe", status: "archive", short_note: "short note", notes: "interview experiences"},
+//       {id:"22", company: "Company 2", position: "forward deployed engineer", status: "reject", short_note: "short note", notes: "interview experiences"},
+//     ]}, 
+//     {name: "Company 3", applications:[
+//       {id:"31", company: "Company 3", position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
+//       {id:"32", company: "Company 3", position: "customer support", status: "archive", short_note: "short note", notes: "interview experiences"},
+//     ]},
+//     {name: "Company 4", applications:[
+//       {id:"41", company: "Company 4",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
+//     ]},
+//     {name: "Company 5", applications:[
+//       {id:"51", company: "Company 5",position: "dev rel", status: "ready to apply", short_note: "short note", notes: "interview experiences"},
+//       {id:"52", company: "Company 5",position: "content writer", status: "offer", short_note: "short note", notes: "interview experiences"},
+//       {id:"53", company: "Company 5",position: "implementation", status: "offer", short_note: "short note", notes: "interview experiences"},
+//       {id:"54", company: "Company 5",position: "customer support", status: "in progress", short_note: "short note", notes: "interview experiences"},
+//     ]},
+//     {name: "Company 6", applications:[
+//       {id:"61", company: "Company 6",position: "dev rel", status: "in progress", short_note: "short note", notes: "interview experiences"},
+//     ]}
+// ])
+
+async function databaseSelected(event) {
+  const file = event.target.files[0]
+  if (!file) return
+  await loadDatabaseFromFile(file)
+  console.log("database loaded")
+  companies.value = listApplications()
+  companies_prop.value = companies.value
+  initial.value = false
+  jatEvents.value = listAllEvents()
+}
+
+async function createFreshDatabase() {
+  await createEmptyDatabase()
+  console.log("empty database created")
+  companies_prop.value = companies.value
+  initial.value = false
+}
+
+async function addEvent(payload) {
   if (payload.date.trim() === "" || payload.time.trim() === "" || payload.title.trim() === "") return
   let tempEvents =  jatEvents.value[payload.date.trim()]
   if (tempEvents){
@@ -87,19 +140,26 @@ function addEvent(payload) {
         title: payload.title.trim() 
       }]
   }
-  console.log(payload)
+  addJATEvent(payload.date.trim(), payload.time.trim(), payload.title.trim())
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
-function deleteEvent(payload) {
+
+async function deleteEvent(payload) {
   if (payload.date.trim() === "" || payload.time.trim() === "") return
   let tempEvents =  jatEvents.value[payload.date.trim()]
   if (tempEvents){
     const idx = jatEvents.value[payload.date.trim()].findIndex(e => e.time === payload.time.trim())
     jatEvents.value[payload.date.trim()].splice(idx, 1)
   }
-  console.log(payload)
+  deleteJATEvent(payload.date.trim(), payload.time.trim())
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
 
-function addNewJobApplication(newJobApplication) {
+async function addNewJobApplication(newJobApplication) {
   if (newJobApplication.companyName.trim() === "" || newJobApplication.position.trim() === "" || newJobApplication.status.trim() === "") return
   const idx = companies.value.findIndex(company => company.name === newJobApplication.companyName)
   if (idx !== -1){
@@ -126,6 +186,11 @@ function addNewJobApplication(newJobApplication) {
     })    
   }
   companies_prop.value = [...companies.value]
+  console.log(newJobApplication)
+  createApplication(newJobApplication.companyName, newJobApplication.position, newJobApplication.status)
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
 
 function filterApplicationsByCompany(companyName) {
@@ -134,7 +199,6 @@ function filterApplicationsByCompany(companyName) {
     companies_prop.value = companies.value
     return
   }
-
   const company = companies.value.find(c => c.name.trim().toLowerCase() === companyName)
   companies_prop.value = []
   companies_prop.value = company ? [company] : []
@@ -146,14 +210,11 @@ function filterApplicationsByStatus(applicationStatus) {
     companies_prop.value = companies.value
     return
   }
-
   companies_prop.value = []
-
   for (let c of companies.value) {
     const applications = c.applications.filter(
       app => app.status === applicationStatus
     )
-
     if (applications.length > 0) {
       companies_prop.value.push({
         name: c.name,
@@ -163,7 +224,7 @@ function filterApplicationsByStatus(applicationStatus) {
   }
 }
 
-function updateApplicationStatus(payload) {
+async function updateApplicationStatus(payload) {
   let comp_idx = 0
   for (let c of companies.value) {
     const app_idx = c.applications.findIndex(
@@ -175,9 +236,13 @@ function updateApplicationStatus(payload) {
     }
     comp_idx += 1
   }
+  updateStatus(payload.applicationId, payload.status)
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
 
-function updateShortNote(payload) {
+async function updateShortNote(payload) {
   let comp_idx = 0
   for (let c of companies.value) {
     const app_idx = c.applications.findIndex(
@@ -189,9 +254,13 @@ function updateShortNote(payload) {
     }
     comp_idx += 1
   }
+  updateShortNotes(payload.applicationId, payload.shortNote)
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
 
-function updateApplicationNotes(payload) {
+async function updateApplicationNotes(payload) {
   let comp_idx = 0
   for (let c of companies.value) {
     const app_idx = c.applications.findIndex(
@@ -203,15 +272,33 @@ function updateApplicationNotes(payload) {
     }
     comp_idx += 1
   }
+  updateNotes(payload.applicationId, payload.notes)
+  const db = getDB()
+  const data = db.export()
+  await saveDatabase(data)
 }
+
+
+function exportDatabase(){
+  window.downloadDatabase = () => {
+    const data = db.export();
+    const buffer = new Uint8Array(data);
+    const blob = new Blob([buffer], { type: "application/sqlite" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "jat.db";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+}
+
 </script>
 
 <style>
-
 body {
   align-items: center;
   background: #f5f6f8;
-  font-family: Roboto, Arial, sans-serif;
+  font-family: Roboto;
   justify-content: space-between;
   margin: 50px;
 }
