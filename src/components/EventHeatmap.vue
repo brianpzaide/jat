@@ -233,8 +233,6 @@ function addEvent() {
     time: dialog.time,
     title: dialog.title
   })
-
-  dialog.visible = false
 }
 
 function deleteEvent(eDate, eTime) {

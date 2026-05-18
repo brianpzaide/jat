@@ -2,7 +2,7 @@ const DB_NAME = "job-app-tracker"
 const STORE_NAME = "sqlite"
 const KEY = "database"
 
-function openIndexedDb() {
+function openIndexedDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1)
         request.onupgradeneeded = () => {
@@ -21,7 +21,7 @@ function openIndexedDb() {
 }
 
 export async function loadDatabase() {
-    const db = await openIndexedDb()
+    const db = await openIndexedDB()
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readonly")
         const store = tx.objectStore(STORE_NAME)
@@ -36,7 +36,7 @@ export async function loadDatabase() {
 }
 
 export async function saveDatabase(uint8Array) {
-    const db = await openIndexedDb()
+    const db = await openIndexedDB()
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readwrite")
         const store = tx.objectStore(STORE_NAME)

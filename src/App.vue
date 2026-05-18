@@ -143,7 +143,7 @@ async function addEvent(payload) {
   addJATEvent(payload.date.trim(), payload.time.trim(), payload.title.trim())
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 async function deleteEvent(payload) {
@@ -156,7 +156,7 @@ async function deleteEvent(payload) {
   deleteJATEvent(payload.date.trim(), payload.time.trim())
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 async function addNewJobApplication(newJobApplication) {
@@ -190,7 +190,7 @@ async function addNewJobApplication(newJobApplication) {
   createApplication(newJobApplication.companyName, newJobApplication.position, newJobApplication.status)
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 function filterApplicationsByCompany(companyName) {
@@ -239,7 +239,7 @@ async function updateApplicationStatus(payload) {
   updateStatus(payload.applicationId, payload.status)
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 async function updateShortNote(payload) {
@@ -257,7 +257,7 @@ async function updateShortNote(payload) {
   updateShortNotes(payload.applicationId, payload.shortNote)
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 async function updateApplicationNotes(payload) {
@@ -275,12 +275,13 @@ async function updateApplicationNotes(payload) {
   updateNotes(payload.applicationId, payload.notes)
   const db = getDB()
   const data = db.export()
-  await saveDatabase(data)
+  // await saveDatabase(data)
 }
 
 
 function exportDatabase(){
   window.downloadDatabase = () => {
+    const db = getDB()
     const data = db.export();
     const buffer = new Uint8Array(data);
     const blob = new Blob([buffer], { type: "application/sqlite" });
@@ -289,7 +290,8 @@ function exportDatabase(){
     a.download = "jat.db";
     a.click();
     URL.revokeObjectURL(a.href);
-  };
+  }
+  window.downloadDatabase()
 }
 
 </script>
