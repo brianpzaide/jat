@@ -76,12 +76,12 @@
       >
         <div
           v-for="e in jatEvents[dialog.date]"
-          :key="e.time"
+          :key="e.id"
           class="event-item"
         >
           <button
             class="delete-btn"
-            @click.stop="deleteEvent(dialog.date, e.time)"
+            @click.stop="deleteEvent(e.id, dialog.date, e.time)"
           >
             ×
           </button>
@@ -235,9 +235,10 @@ function addEvent() {
   })
 }
 
-function deleteEvent(eDate, eTime) {
-  if (!eDate || !eTime) return
+function deleteEvent(event_id, eDate, eTime) {
+  if (!eDate || !eTime || !event_id) return
   emit("delete-event", {
+    event_id: event_id,
     date: eDate,
     time: eTime
   })

@@ -5,6 +5,8 @@ import {
     loadDatabase
 } from "./storage"
 
+let SQL = null
+let db = null
 
 const schema =`
 CREATE TABLE IF NOT EXISTS job_applications(
@@ -20,45 +22,25 @@ CREATE TABLE IF NOT EXISTS events(
    id INTEGER PRIMARY KEY AUTOINCREMENT,
    scheduled_date TEXT NOT NULL,
    scheduled_time TEXT NOT NULL,
-   engagement TEXT
+   engagement TEXT NOT NULL
 );
 `
-
-let create_application = "INSERT INTO job_applications(company, position, status, shortnotes, notes) VALUES(?, ?, ?, ?, ?);";
-
-let list_companies = "SELECT DISTINCT company FROM job_applications;";
-
-let list_applications_for = "SELECT * FROM job_applications WHERE company = ?;";
-
-let update_application_status = "UPDATE job_applications WHERE id = ? SET status = ?;";
-
-let update_application_notes = "UPDATE job_applications WHERE id = ? SET notes = ?;";
-
-let update_application_shortnotes = "UPDATE job_applications WHERE id = ? SET shortnotes = ?;";
-
-let list_events = "SELECT * FROM events;";
-
-let add_event = "INSERT INTO events(scheduled_date, scheduled_time, engagement) VALUES(?, ?, ?);";
-
-let delete_event = "DELETE FROM events WHERE scheduled_date = ? AND scheduled_time = ?";
-
-let SQL = null
-let db = null
-
-export async function initEngine(){
+export async function initDBEngine(){
     if (SQL) return
     SQL = await initSqlJs({
         locateFile: file =>`/sql-wasm.wasm`
     })
-    const savedDb = await loadDatabase()
-    if (savedDb) {
-        db = new SQL.Database(savedDb)
-    } else {
-        db = new SQL.Database()
-        db.run(schema)
-        const data = db.export()
-        await saveDatabase(data)
-    }
+    db = new SQL.Database()
+    db.run(schema)
+    // const savedDb = await loadDatabase()
+    // if (savedDb) {
+    //     db = new SQL.Database(savedDb)
+    // } else {
+    //     db = new SQL.Database()
+    //     db.run(schema)
+    //     const data = db.export()
+    //     await saveDatabase(data)
+    // }
 }
 
 export async function createEmptyDatabase() {
@@ -69,7 +51,7 @@ export async function createEmptyDatabase() {
 }
 
 export async function loadDatabaseFromFile(file){
-    await initEngine()
+    await initDBEngine()
     const buffer = await file.arrayBuffer()
     const uint8Array = new Uint8Array(buffer)
     db = new SQL.Database(uint8Array)
@@ -77,11 +59,14 @@ export async function loadDatabaseFromFile(file){
     return db
 }
 
-export function createApplication(companyName, position, status){
-    db.run(create_application, [companyName, position, status, 'short note', 'interview experience notes']);
+const create_application = "INSERT INTO job_applications(company, position, status, shortnotes, notes) VALUES(?, ?, ?, ?, ?);";
+export function createApplicationDB(companyName, position, status){
+    db.run(create_application, [companyName, position, status, 'short notes', 'interview experience notes']);
 }
 
-export function listApplications(){
+const list_companies = "SELECT DISTINCT company FROM job_applications;";
+const list_applications_for = "SELECT * FROM job_applications WHERE company = ?;";
+export function listApplicationsDB(){
     const companyResults = db.exec(list_companies)
     if (companyResults.length === 0) {
         return []
@@ -111,20 +96,57 @@ export function listApplications(){
             applications: appsForCompany
         })
     }
+    console.log(applications)
     return applications
 }
 
-export function listAllEvents(){
+const update_application_status = "UPDATE job_applications SET status = ? WHERE id = ?;";
+export function updateStatusDB(applicationId, status){
+    try{
+        db.run(update_application_status, [status, applicationId]);
+        console.log("updating status successful")
+    }catch(err){
+        console.error("failed to updating status for application", err, applicationId)
+    }
+    
+}
+
+const update_application_notes = "UPDATE job_applications SET notes = ? WHERE id = ?;";
+export function updateNotesDB(applicationId, notes){
+    try{
+        db.run(update_application_notes, [notes, applicationId]);
+        console.log("updating notes successful")
+    }catch(err){
+        console.error("failed to updating notes for application", err, applicationId)
+    }
+}
+
+const update_application_shortnotes = "UPDATE job_applications SET shortnotes = ? WHERE id = ?;";
+export function updateShortNoteDB(applicationId, short_notes){
+    try{
+        db.run(update_application_shortnotes, [short_notes, applicationId]);
+        console.log("updating short notes successful")
+    }catch(err){
+        console.error("failed to updating short notes for application", err, applicationId)
+    }
+    
+}
+
+
+const list_events = "SELECT * FROM events;";
+export function listAllEventsDB(){
     const events = db.exec(list_events);
     let jat_events = {}
     for (const e of events[0].values){
-        if (jat_events[e[1]] !== null) {
+        if (!jat_events[e[1]]) {
             jat_events[e[1]] = [{
+                "id": e[0],
                 "time": e[2],
                 "title": e[3]
             }]
         }else{
             jat_events[e[1]].push({
+                "id": e[0],
                 "time": e[2],
                 "title": e[3]                
             })
@@ -134,27 +156,23 @@ export function listAllEvents(){
     return jat_events
 }
 
-export function addJATEvent(scheduled_date, scheduled_time, engagement){
-    db.run(add_event, [scheduled_date, scheduled_time, engagement]); 
+const add_event = "INSERT INTO events (scheduled_date, scheduled_time, engagement) VALUES (?, ?, ?) RETURNING id;";
+export function addJATEventDB(scheduled_date, scheduled_time, engagement){
+    console.log(scheduled_date, scheduled_time, engagement)
+    try{
+        const id = db.run(add_event, [scheduled_date, scheduled_time, engagement]);
+        return id
+    }catch(err) {
+        console.error("failed to insert event", err)
+        return null
+    }   
 }
 
-export function deleteJATEvent(scheduled_date, scheduled_time){
-    db.run(delete_event, [scheduled_date, scheduled_time]);
-}
-
-export function updateStatus(applicationId, status){
-    db.run(update_application_status, [applicationId, status]);
-}
-
-export function updateNotes(applicationId, notes){
-    db.run(update_application_notes, [applicationId, notes]);
-}
-
-export function updateShortNotes(applicationId, short_notes){
-    db.run(update_application_shortnotes, [applicationId, short_notes]);
+const delete_event = "DELETE FROM events WHERE id = ?";
+export function deleteJATEventDB(id){
+    db.run(delete_event, [id]);
 }
 
 export function getDB(){
     return db
 }
-

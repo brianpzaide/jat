@@ -46,15 +46,15 @@ import ApplicationsHolder from './components/ApplicationsHolder.vue'
 import {
   loadDatabaseFromFile,
   createEmptyDatabase,
-  createApplication,
-  listApplications,
-  addJATEvent, 
-  deleteJATEvent,
-  getDB,
-  listAllEvents,
-  updateStatus,
-  updateNotes,
-  updateShortNotes
+  createApplicationDB,
+  listApplicationsDB,
+  updateStatusDB,
+  updateNotesDB,
+  updateShortNoteDB,
+  listAllEventsDB,
+  addJATEventDB,
+  deleteJATEventDB,
+  getDB
 } from "./db/db"
 
 
@@ -69,14 +69,13 @@ const companies = ref([])
 const companies_prop = ref([])
 const jatEvents = ref({})
 
-
 // const jatEvents = ref({
 //   "2026-03-05": [
-//     { time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss." }
+//     { id: 1, time: "10:00 - 11:00", title: "Meeting with boss. Meeting with boss." }
 //   ],
 
 //   "2026-03-10": [
-//     { time: "09:00 - 10:00", title: "Standup meeting." }
+//     { id: 1, time: "09:00 - 10:00", title: "Standup meeting." }
 //   ]
 // })
 
@@ -113,10 +112,10 @@ async function databaseSelected(event) {
   if (!file) return
   await loadDatabaseFromFile(file)
   console.log("database loaded")
-  companies.value = listApplications()
+  companies.value = listApplicationsDB()
   companies_prop.value = companies.value
   initial.value = false
-  jatEvents.value = listAllEvents()
+  jatEvents.value = listAllEventsDB()
 }
 
 async function createFreshDatabase() {
@@ -128,34 +127,38 @@ async function createFreshDatabase() {
 
 async function addEvent(payload) {
   if (payload.date.trim() === "" || payload.time.trim() === "" || payload.title.trim() === "") return
-  let tempEvents =  jatEvents.value[payload.date.trim()]
-  if (tempEvents){
-    jatEvents.value[payload.date.trim()].push({
-      time: payload.time.trim(), 
-      title: payload.title.trim()
-    })
-  }else{
-      jatEvents.value[payload.date.trim()] =[{
+  const id = addJATEventDB(payload.date.trim(), payload.time.trim(), payload.title.trim())
+  if (id){
+    let tempEvents =  jatEvents.value[payload.date.trim()]
+    if (tempEvents){
+      jatEvents.value[payload.date.trim()].push({
+        id: id,
         time: payload.time.trim(), 
-        title: payload.title.trim() 
-      }]
+        title: payload.title.trim()
+      })
+    }else{
+        jatEvents.value[payload.date.trim()] =[{
+          id: id,
+          time: payload.time.trim(), 
+          title: payload.title.trim() 
+        }]
+    }
   }
-  addJATEvent(payload.date.trim(), payload.time.trim(), payload.title.trim())
-  const db = getDB()
-  const data = db.export()
+  // const db = getDB()
+  // const data = db.export()
   // await saveDatabase(data)
 }
 
 async function deleteEvent(payload) {
-  if (payload.date.trim() === "" || payload.time.trim() === "") return
+  if (payload.date.trim() === "" || payload.time.trim() === "" || !payload.event_id) return
   let tempEvents =  jatEvents.value[payload.date.trim()]
   if (tempEvents){
-    const idx = jatEvents.value[payload.date.trim()].findIndex(e => e.time === payload.time.trim())
+    const idx = jatEvents.value[payload.date.trim()].findIndex(e => e.id === payload.event_id)
     jatEvents.value[payload.date.trim()].splice(idx, 1)
   }
-  deleteJATEvent(payload.date.trim(), payload.time.trim())
-  const db = getDB()
-  const data = db.export()
+  deleteJATEventDB(payload.event_id)
+  // const db = getDB()
+  // const data = db.export()
   // await saveDatabase(data)
 }
 
@@ -187,9 +190,9 @@ async function addNewJobApplication(newJobApplication) {
   }
   companies_prop.value = [...companies.value]
   console.log(newJobApplication)
-  createApplication(newJobApplication.companyName, newJobApplication.position, newJobApplication.status)
-  const db = getDB()
-  const data = db.export()
+  createApplicationDB(newJobApplication.companyName, newJobApplication.position, newJobApplication.status)
+  // const db = getDB()
+  // const data = db.export()
   // await saveDatabase(data)
 }
 
@@ -232,14 +235,14 @@ async function updateApplicationStatus(payload) {
     )
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].status = payload.status
+        updateStatusDB(payload.applicationId, payload.status)
+        // const db = getDB()
+        // const data = db.export()
+        // await saveDatabase(data)
       return
     }
     comp_idx += 1
   }
-  updateStatus(payload.applicationId, payload.status)
-  const db = getDB()
-  const data = db.export()
-  // await saveDatabase(data)
 }
 
 async function updateShortNote(payload) {
@@ -250,14 +253,14 @@ async function updateShortNote(payload) {
     )
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].short_note = payload.shortNote
+      updateShortNoteDB(payload.applicationId, payload.shortNote)
+      // const db = getDB()
+      // const data = db.export()
+      // await saveDatabase(data)      
       return
     }
     comp_idx += 1
   }
-  updateShortNotes(payload.applicationId, payload.shortNote)
-  const db = getDB()
-  const data = db.export()
-  // await saveDatabase(data)
 }
 
 async function updateApplicationNotes(payload) {
@@ -268,14 +271,14 @@ async function updateApplicationNotes(payload) {
     )
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].notes = payload.notes
+      updateNotesDB(payload.applicationId, payload.notes)
+      // const db = getDB()
+      // const data = db.export()
+      // await saveDatabase(data)      
       return
     }
     comp_idx += 1
   }
-  updateNotes(payload.applicationId, payload.notes)
-  const db = getDB()
-  const data = db.export()
-  // await saveDatabase(data)
 }
 
 

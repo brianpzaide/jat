@@ -94,8 +94,6 @@ function save() {
 
   border: 1px solid #d0d7de;
   border-radius: 6px;
-
-  overflow: hidden;
 }
 
 .toolbar {
@@ -122,14 +120,16 @@ function save() {
 .editor-container {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   padding: 12px;
   display: flex;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .editor {
   flex: 1;
   min-height: 0;
+  min-width: 0;
 
   width: 100%;
   height: 100%;
@@ -141,13 +141,17 @@ function save() {
   padding: 12px;
   font-family: monospace;
   line-height: 1.5;
-
-  overflow-y: auto;
+  
+  white-space: pre;
+  
+  overflow: auto;
 }
 
 .preview {
-  height: 100%;
-  overflow-y: auto;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
   line-height: 1.5;
 }
 
@@ -155,10 +159,17 @@ function save() {
   background: #f6f8fa;
   padding: 16px;
   border-radius: 6px;
-  overflow-x: auto;
+  overflow: auto;
+  white-space: pre;
 }
 
 .preview code {
   font-family: monospace;
 }
 </style>
+
+
+
+
+
+
