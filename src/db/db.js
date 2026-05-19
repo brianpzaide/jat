@@ -44,7 +44,7 @@ export async function initDBEngine(){
 }
 
 export async function createEmptyDatabase() {
-    await initEngine()
+    await initDBEngine()
     db = new SQL.Database()
     db.run(schema)
     return db
@@ -57,6 +57,10 @@ export async function loadDatabaseFromFile(file){
     db = new SQL.Database(uint8Array)
     db.run(schema)
     return db
+}
+
+export async function loadDatabaseFromIndexedDb(){
+    
 }
 
 const create_application = "INSERT INTO job_applications(company, position, status, shortnotes, notes) VALUES(?, ?, ?, ?, ?);";

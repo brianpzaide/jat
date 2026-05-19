@@ -57,9 +57,16 @@ import {
   getDB
 } from "./db/db"
 
-
+import{
+  openIndexedDB,
+  loadDBAndSession,
+  saveDBAndSession,
+  deleteDatabase
+} from "./db/storage"
 
 import { ref } from "vue"
+
+const SESSION_TTL = 1000 * 60 * 60
 
 const initial = ref(true)
 
@@ -144,9 +151,9 @@ async function addEvent(payload) {
         }]
     }
   }
-  // const db = getDB()
-  // const data = db.export()
-  // await saveDatabase(data)
+  const db = getDB()
+  const data = db.export()
+  await saveDBAndSession(data)
 }
 
 async function deleteEvent(payload) {
@@ -157,9 +164,9 @@ async function deleteEvent(payload) {
     jatEvents.value[payload.date.trim()].splice(idx, 1)
   }
   deleteJATEventDB(payload.event_id)
-  // const db = getDB()
-  // const data = db.export()
-  // await saveDatabase(data)
+  const db = getDB()
+  const data = db.export()
+  await saveDBAndSession(data)
 }
 
 async function addNewJobApplication(newJobApplication) {
@@ -191,9 +198,9 @@ async function addNewJobApplication(newJobApplication) {
   companies_prop.value = [...companies.value]
   console.log(newJobApplication)
   createApplicationDB(newJobApplication.companyName, newJobApplication.position, newJobApplication.status)
-  // const db = getDB()
-  // const data = db.export()
-  // await saveDatabase(data)
+  const db = getDB()
+  const data = db.export()
+  await saveDBAndSession(data)
 }
 
 function filterApplicationsByCompany(companyName) {
@@ -236,9 +243,9 @@ async function updateApplicationStatus(payload) {
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].status = payload.status
         updateStatusDB(payload.applicationId, payload.status)
-        // const db = getDB()
-        // const data = db.export()
-        // await saveDatabase(data)
+        const db = getDB()
+        const data = db.export()
+        await saveDBAndSession(data)
       return
     }
     comp_idx += 1
@@ -254,9 +261,9 @@ async function updateShortNote(payload) {
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].short_note = payload.shortNote
       updateShortNoteDB(payload.applicationId, payload.shortNote)
-      // const db = getDB()
-      // const data = db.export()
-      // await saveDatabase(data)      
+      const db = getDB()
+      const data = db.export()
+      await saveDBAndSession(data)    
       return
     }
     comp_idx += 1
@@ -272,9 +279,9 @@ async function updateApplicationNotes(payload) {
     if (app_idx !== -1) {
       companies.value[comp_idx].applications[app_idx].notes = payload.notes
       updateNotesDB(payload.applicationId, payload.notes)
-      // const db = getDB()
-      // const data = db.export()
-      // await saveDatabase(data)      
+      const db = getDB()
+      const data = db.export()
+      await saveDBAndSession(data)      
       return
     }
     comp_idx += 1
@@ -282,7 +289,7 @@ async function updateApplicationNotes(payload) {
 }
 
 
-function exportDatabase(){
+async function exportDatabase(){
   window.downloadDatabase = () => {
     const db = getDB()
     const data = db.export();
@@ -295,6 +302,7 @@ function exportDatabase(){
     URL.revokeObjectURL(a.href);
   }
   window.downloadDatabase()
+  await deleteDatabase()
 }
 
 </script>
