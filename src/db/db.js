@@ -1,9 +1,9 @@
 import initSqlJs from "sql.js"
 
-import {
-    saveDatabase,
-    loadDatabase
-} from "./storage"
+// import {
+//     saveDatabase,
+//     loadDatabase
+// } from "./storage"
 
 let SQL = null
 let db = null

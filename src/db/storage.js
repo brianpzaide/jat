@@ -4,7 +4,7 @@ const KEY = "database"
 const SESSION_KEY = "last_active_at"
 
 
-function openIndexedDB() {
+export function openIndexedDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1)
         request.onupgradeneeded = () => {
