@@ -139,15 +139,6 @@ function application_selected(application_id){
 </script>
 
 <style scoped>
-/* .holder {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 16px;
-  gap: 12px;
-  background: #fafafa;
-  margin: 20px;
-} */
 .holder {
   height: 100%;
   min-height: 0;

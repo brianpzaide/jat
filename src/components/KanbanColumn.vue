@@ -32,10 +32,6 @@ import KanbanCard from './KanbanCard.vue'
 import draggable from 'vuedraggable'
 
 const props = defineProps({
-  // label: {
-  //   type: String,
-  //   required: true
-  // },
   statusKey: {
     type: String,
     required: true
@@ -101,9 +97,7 @@ function handleDragChange(event){
 <style scoped>
 .kanban-column {
   width: 320px;
-  /* min-width: 320px; */
   height: 100%;
-  /* max-height: 100%; */
   display: flex;
   flex-direction: column;
   background: #f4f5f7;

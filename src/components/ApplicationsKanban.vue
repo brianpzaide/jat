@@ -38,14 +38,6 @@ const emit = defineEmits([
   'update-application-status'
 ])
 
-// const columns = [
-//   { key: 'ready to apply', label: 'Ready to Apply' },
-//   { key: 'in progress', label: 'In Progress' },
-//   { key: 'offer', label: 'Offer' },
-//   { key: 'reject', label: 'Reject' },
-//   { key: 'archive', label: 'Archive' }
-// ]
-
 function getApplicationsForColumn(columnKey) {
   return props.applications.filter(
     application => application.status === columnKey

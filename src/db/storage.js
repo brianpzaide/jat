@@ -1,10 +1,9 @@
 const DB_NAME = "jat_store"
 const STORE_NAME = "jat_sqlite_session"
 const KEY = "database"
-const SESSION_KEY = "last_active_at"
 
 
-export function openIndexedDB() {
+function openIndexedDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1)
         request.onupgradeneeded = () => {
@@ -22,17 +21,15 @@ export function openIndexedDB() {
     })
 }
 
-export async function loadDBAndSession() {
+export async function loadDBFromStorage() {
     const db = await openIndexedDB()
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readonly")
         const store = tx.objectStore(STORE_NAME)
-        const request1 = store.get(KEY)
-        const request2 = store.get(SESSION_KEY)
+        const request = store.get(KEY)
         tx.oncomplete = () => {
             const result = [
-                request1.result ?? null,
-                request2.result ?? null
+                request.result ?? null
             ]
             db.close()
             resolve(result)
@@ -41,7 +38,6 @@ export async function loadDBAndSession() {
             db.close()
             reject(tx.error)
         }
-
         tx.onabort = () => {
             db.close()           
             reject(tx.error)
@@ -49,13 +45,12 @@ export async function loadDBAndSession() {
     })
 }
 
-export async function saveDBAndSession(uint8Array) {
+export async function saveDBIntoStorage(uint8Array) {
     const db = await openIndexedDB()
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readwrite")
         const store = tx.objectStore(STORE_NAME)
         store.put(uint8Array, KEY)
-        store.put(Date.now(), SESSION_KEY)
         tx.oncomplete = () => {
             db.close()
             resolve()
@@ -71,7 +66,7 @@ export async function saveDBAndSession(uint8Array) {
     })
 }
 
-export function deleteDatabase() {
+export function deleteDatabaseFromStorage() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.deleteDatabase(DB_NAME)
         request.onsuccess = () => resolve()

@@ -1,9 +1,5 @@
 import initSqlJs from "sql.js"
 
-// import {
-//     saveDatabase,
-//     loadDatabase
-// } from "./storage"
 
 let SQL = null
 let db = null
@@ -30,24 +26,12 @@ export async function initDBEngine(){
     SQL = await initSqlJs({
         locateFile: file =>`/sql-wasm.wasm`
     })
-    db = new SQL.Database()
-    db.run(schema)
-    // const savedDb = await loadDatabase()
-    // if (savedDb) {
-    //     db = new SQL.Database(savedDb)
-    // } else {
-    //     db = new SQL.Database()
-    //     db.run(schema)
-    //     const data = db.export()
-    //     await saveDatabase(data)
-    // }
 }
 
 export async function createEmptyDatabase() {
     await initDBEngine()
     db = new SQL.Database()
     db.run(schema)
-    return db
 }
 
 export async function loadDatabaseFromFile(file){
@@ -56,16 +40,20 @@ export async function loadDatabaseFromFile(file){
     const uint8Array = new Uint8Array(buffer)
     db = new SQL.Database(uint8Array)
     db.run(schema)
-    return db
 }
 
-export async function loadDatabaseFromIndexedDb(){
-    
+export async function loadDatabaseFromIndexedDB(savedDB){
+    await initDBEngine()
+    db = new SQL.Database(savedDB)
+    db.run(schema)
 }
 
-const create_application = "INSERT INTO job_applications(company, position, status, shortnotes, notes) VALUES(?, ?, ?, ?, ?);";
+const create_application = "INSERT INTO job_applications(company, position, status, shortnotes, notes) VALUES(?, ?, ?, ?, ?) RETURNING id;";
 export function createApplicationDB(companyName, position, status){
-    db.run(create_application, [companyName, position, status, 'short notes', 'interview experience notes']);
+    const row = db.exec(create_application, [companyName, position, status, 'short notes', 'interview experience notes']);
+    console.log("in create new job application: row[0].values", row[0].values)
+    console.log("in create new job application: row[0].values[0]", row[0].values[0][0])
+    return row[0].values[0][0]
 }
 
 const list_companies = "SELECT DISTINCT company FROM job_applications;";
@@ -164,8 +152,8 @@ const add_event = "INSERT INTO events (scheduled_date, scheduled_time, engagemen
 export function addJATEventDB(scheduled_date, scheduled_time, engagement){
     console.log(scheduled_date, scheduled_time, engagement)
     try{
-        const id = db.run(add_event, [scheduled_date, scheduled_time, engagement]);
-        return id
+        const row = db.exec(add_event, [scheduled_date, scheduled_time, engagement]);
+        return row[0].values[0][0]
     }catch(err) {
         console.error("failed to insert event", err)
         return null

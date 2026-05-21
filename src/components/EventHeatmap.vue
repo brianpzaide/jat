@@ -62,14 +62,6 @@
         <button @click="dialog.visible = false">Cancel</button>
       </div>
 
-      <!-- <div class="event-list"
-        v-for="e in jatEvents[dialog.date]"
-        :key="e.time"
-        @click="deleteEvent(dialog.date, e.time)"
-        >
-        {{e.time + ": " + e.title}}
-      </div>    -->
-
       <div
         v-if="jatEvents[dialog.date]?.length"
         class="event-list"
