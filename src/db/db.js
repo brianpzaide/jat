@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS events(
 export async function initDBEngine(){
     if (SQL) return
     SQL = await initSqlJs({
-        locateFile: file =>`/sql-wasm.wasm`
+        locateFile: file => `${import.meta.env.BASE_URL}${file}`
     })
 }
 
