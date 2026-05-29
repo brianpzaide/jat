@@ -10,7 +10,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
-  base: 'jat',
+  base: '/jat/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
