@@ -38,21 +38,9 @@ The downloaded SQLite file acts as the portable backup/source-of-truth.
 
 ## Tech Stack
 
-### Frontend
-
 * Vue 3
-* Composition API
-
-### Persistence
-
 * sql.js
 * IndexedDB
-
-### Markdown
-
-* marked
-* highlight.js
-* DOMPurify
 
 ---
 
@@ -93,7 +81,7 @@ The application follows a local-first architecture.
 
 * users can download the SQLite database file
 
-When the application reloads:
+When the application reloads/browser refreshes:
 
 * if a database exists in IndexedDB, it is restored automatically
 * otherwise users may:
