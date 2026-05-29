@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS events(
 `
 export async function initDBEngine(){
     if (SQL) return
+    console.log(import.meta.env.BASE_URL)
     SQL = await initSqlJs({
         locateFile: file => `${import.meta.env.BASE_URL}${file}`
     })
