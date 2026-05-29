@@ -1,40 +1,132 @@
-# jat
+# Job Application Tracker
 
-WIP
+A local-first job application tracker built with Vue 3, sql.js, and IndexedDB.
 
-This template should help get you started developing with Vue 3 in Vite.
+The application runs entirely in the browser. User data never leaves the device unless the user explicitly downloads and shares the SQLite database file.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Recommended Browser Setup
+* fully browser-based
+* offline capable
+* SQLite-powered
+* no backend
+* no authentication
+* no external storage
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+The goal was to build a responsive, privacy-focused application that behaves similarly to a desktop application while remaining deployable as a static website (for example via GitHub Pages).
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### Local-First Persistence
 
-## Project Setup
+The application uses:
 
-```sh
-npm install
+* sql.js (SQLite compiled to WebAssembly)
+* IndexedDB for browser persistence
+
+Users may:
+
+* start with an empty database
+* upload an existing SQLite database file
+* download/export their database at any time
+
+The downloaded SQLite file acts as the portable backup/source-of-truth.
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* Vue 3
+* Composition API
+
+### Persistence
+
+* sql.js
+* IndexedDB
+
+### Markdown
+
+* marked
+* highlight.js
+* DOMPurify
+
+---
+
+## Database Schema
+
+```sql
+CREATE TABLE IF NOT EXISTS job_applications(
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   company TEXT NOT NULL,
+   position TEXT NOT NULL,
+   status TEXT NOT NULL,
+   shortnotes TEXT,
+   notes TEXT
+);
+CREATE TABLE IF NOT EXISTS events(
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   scheduled_date TEXT NOT NULL,
+   scheduled_time TEXT NOT NULL,
+   engagement TEXT NOT NULL
+);
 ```
 
-### Compile and Hot-Reload for Development
+---
 
-```sh
+## Persistence Model
+
+The application follows a local-first architecture.
+
+### Runtime
+
+* sql.js in-memory SQLite database
+
+### Browser Persistence
+
+* IndexedDB stores the current SQLite database state
+
+### Export
+
+* users can download the SQLite database file
+
+When the application reloads:
+
+* if a database exists in IndexedDB, it is restored automatically
+* otherwise users may:
+
+  * upload a database
+  * start fresh
+
+---
+
+## Why sql.js?
+
+This project was also an exploration of:
+
+* SQLite in the browser
+* WASM-based persistence
+* local-first application architecture
+* browser-only CRUD systems
+* offline-capable UX patterns
+
+Using sql.js allowed the application to preserve a real relational database model without requiring a backend service.
+
+---
+
+## Running Locally
+
+```bash
+npm install
 npm run dev
 ```
 
-### Compile and Minify for Production
+---
 
-```sh
-npm run build
-```
+## Demo
+
+---
+

@@ -1,8 +1,10 @@
 <template>
   <div v-if="db_in_storage">
-    <button @click="exportDatabase">
+    <button class="download-db-btn"
+      @click="exportDatabase">
       Download database
     </button>
+
     <NewJobApplication
       :applicationStatusOptions="applicationStatusOptions"
       @add-new-application="addNewJobApplication"
@@ -26,15 +28,42 @@
     />
   </div>
 
-  <div class="startup" v-else>
-    <input
-      type="file"
-      accept=".sqlite,.db"
-      @change="databaseSelected"
-    />
-    <button @click="createFreshDatabase">
-      Start Empty
-    </button>
+  <div v-else>
+    <div class="startup">
+      <input
+        type="file"
+        accept=".sqlite,.db"
+        @change="databaseSelected"
+      />
+      <button @click="createFreshDatabase">
+        Start Empty
+      </button>
+    </div>
+    <div class="schema-section" >
+      <button class="help-buttton" @click="showSchema = !showSchema">
+        ?
+      </button>
+      <pre v-if="showSchema" class="schema-viewer">
+        <code>
+          Uses a portable SQLite database, with the following schema
+          
+          CREATE TABLE job_applications(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company TEXT NOT NULL,
+            position TEXT NOT NULL,
+            status TEXT NOT NULL,
+            shortnotes TEXT,
+            notes TEXT
+          );
+          CREATE TABLE events(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            scheduled_date TEXT NOT NULL,
+            scheduled_time TEXT NOT NULL,
+            engagement TEXT NOT NULL
+          );
+        </code>
+      </pre>
+    </div>
   </div>
 </template>
 
@@ -74,6 +103,8 @@ const applicationStatusOptions = ref(["ready to apply", "in progress", "offer", 
 const companies = ref([])
 const companies_prop = ref([])
 const jatEvents = ref({})
+
+const showSchema = ref(false)
 
 onMounted(async () => {
   try {
@@ -307,4 +338,96 @@ body {
   flex-direction: column;
   gap: 24px;
 }
+
+.startup {
+  width: 50%;
+  margin: 60px auto;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.startup input[type="file"] {
+  flex: 1;
+  font-size: 14px;
+}
+
+.startup button {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.startup button:hover {
+  background: #1f2937;
+}
+
+
+.download-db-btn {
+  margin-left: auto;
+  display: block;
+  align-items: center;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #ef4444;
+  color: black;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.download-db-btn:hover {
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+}
+
+
+.schema-section {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.schema-section button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background: #040404;
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.schema-viewer {
+  margin: 0 auto;
+  width: 50%;
+  padding: 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.schema-viewer code {
+  font-family: monospace;
+}
+
+
 </style>
