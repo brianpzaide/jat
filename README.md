@@ -15,7 +15,7 @@ The application runs entirely in the browser. User data never leaves the device 
 * no authentication
 * no external storage
 
-The goal was to build a responsive, privacy-focused application that behaves similarly to a desktop application while remaining deployable as a static website (for example via GitHub Pages).
+The goal was to build a responsive, privacy-focused application.
 
 ---
 
@@ -105,15 +105,14 @@ When the application reloads:
 
 ## Why sql.js?
 
-This project was also an exploration of:
+This project was an exploration of:
 
 * SQLite in the browser
-* WASM-based persistence
 * local-first application architecture
 * browser-only CRUD systems
 * offline-capable UX patterns
 
-Using sql.js allowed the application to preserve a real relational database model without requiring a backend service.
+sql.js enables the application to maintain a relational database model without requiring a backend service.
 
 ---
 
