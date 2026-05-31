@@ -106,5 +106,3 @@ This project was an exploration of:
 npm install
 npm run dev
 ```
-
-
