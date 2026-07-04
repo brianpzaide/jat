@@ -12,7 +12,6 @@ The application runs entirely in the browser. User data never leaves the device 
 * offline capable
 * SQLite-powered
 * no backend
-* no authentication
 * no external storage
 
 The goal was to build a responsive, privacy-focused application.
@@ -99,9 +98,6 @@ This project was an exploration of:
 * local-first application architecture
 * browser-only CRUD systems
 * offline-capable UX patterns
-
-sql.js enables the application to maintain a relational database model without requiring a backend service.
-
 ---
 
 ## Running Locally
@@ -110,5 +106,3 @@ sql.js enables the application to maintain a relational database model without r
 npm install
 npm run dev
 ```
-
-
