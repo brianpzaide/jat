@@ -2,21 +2,29 @@
 
 A local-first job application tracker built with Vue 3, sql.js, and IndexedDB.
 
-The goal was to build a responsive, privacy-focused application that is fully browser-based and works offline. The application runs entirely in the browser, user's data never leaves the device.
+The application runs entirely in the browser. User data never leaves the device unless the user explicitly downloads and shares the SQLite database file.
 
-This project was an exploration of:
+---
 
-* SQLite in the browser
-* local-first application architecture
-* browser-only CRUD systems
-* offline-capable UX patterns
+## Features
 
-## Tech Stack
+* fully browser-based
+* offline capable
+* SQLite-powered
+* no backend
+* no authentication
+* no external storage
+
+The goal was to build a responsive, privacy-focused application.
+
+---
+
+### Local-First Persistence
 
 The application uses:
-* vuejs
-* sql.js, in-memory SQLite database.
-* IndexedDB stores the current SQLite database state, for browser persistence.
+
+* sql.js (SQLite compiled to WebAssembly)
+* IndexedDB for browser persistence
 
 Users may:
 
@@ -24,14 +32,17 @@ Users may:
 * upload an existing SQLite database file
 * download/export their database at any time
 
-When the application reloads/browser refreshes:
+The downloaded SQLite file acts as the portable backup/source-of-truth.
 
-* if a database exists in IndexedDB, it is restored automatically
-* otherwise users may:
+---
 
-  * upload a database
-  * start fresh
+## Tech Stack
 
+* Vue 3
+* sql.js
+* IndexedDB
+
+---
 
 ## Database Schema
 
@@ -51,6 +62,47 @@ CREATE TABLE IF NOT EXISTS events(
    engagement TEXT NOT NULL
 );
 ```
+
+---
+
+## Persistence Model
+
+The application follows a local-first architecture.
+
+### Runtime
+
+* sql.js in-memory SQLite database
+
+### Browser Persistence
+
+* IndexedDB stores the current SQLite database state
+
+### Export
+
+* users can download the SQLite database file
+
+When the application reloads/browser refreshes:
+
+* if a database exists in IndexedDB, it is restored automatically
+* otherwise users may:
+
+  * upload a database
+  * start fresh
+
+---
+
+## Why sql.js?
+
+This project was an exploration of:
+
+* SQLite in the browser
+* local-first application architecture
+* browser-only CRUD systems
+* offline-capable UX patterns
+
+sql.js enables the application to maintain a relational database model without requiring a backend service.
+
+---
 
 ## Running Locally
 
