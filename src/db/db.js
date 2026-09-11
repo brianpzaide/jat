@@ -129,23 +129,27 @@ export function updateShortNoteDB(applicationId, short_notes){
 const list_events = "SELECT * FROM events;";
 export function listAllEventsDB(){
     const events = db.exec(list_events);
+    console.log(events);
     let jat_events = {}
-    for (const e of events[0].values){
-        if (!jat_events[e[1]]) {
-            jat_events[e[1]] = [{
-                "id": e[0],
-                "time": e[2],
-                "title": e[3]
-            }]
-        }else{
-            jat_events[e[1]].push({
-                "id": e[0],
-                "time": e[2],
-                "title": e[3]                
-            })
-        } 
+    if (events.length > 0 && events[0].values.length > 0){
+        for (const e of events[0].values){
+            if (!jat_events[e[1]]) {
+                jat_events[e[1]] = [{
+                    "id": e[0],
+                    "time": e[2],
+                    "title": e[3]
+                }]
+            }else{
+                jat_events[e[1]].push({
+                    "id": e[0],
+                    "time": e[2],
+                    "title": e[3]                
+                })
+            } 
+        }
+        console.log(jat_events)
     }
-    console.log(jat_events)
+
     return jat_events
 }
 
