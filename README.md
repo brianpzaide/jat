@@ -1,19 +1,16 @@
 # Job Application Tracker
 
-A local-first job application tracker built with Vue 3, sql.js, and IndexedDB.
-
-The goal was to build a responsive, privacy-focused application that is fully browser-based and works offline. The application runs entirely in the browser, user's data never leaves the device.
+A job application tracker that runs completely inside the browser.
 
 This project was an exploration of:
 
-* SQLite in the browser
-* local-first application architecture
-* browser-only CRUD systems
-* offline-capable UX patterns
+* Using SQLite directly in the browser
+* Building applications around a local-first architecture
+
 
 ## Tech Stack
 
-The application uses:
+The application was built using:
 * vuejs
 * sql.js, in-memory SQLite database.
 * IndexedDB stores the current SQLite database state, for browser persistence.
@@ -28,7 +25,6 @@ When the application reloads/browser refreshes:
 
 * if a database exists in IndexedDB, it is restored automatically
 * otherwise users may:
-
   * upload a database
   * start fresh
 
