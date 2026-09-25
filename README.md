@@ -1,35 +1,27 @@
 # Job Application Tracker
 
-A job application tracker that runs completely inside the browser.
+A job application tracker to help track and manage your job applications locally. It runs completely inside the browser.
+This project was an exploration of using SQLite directly in the browser.
 
-This project was an exploration of:
-
-* Using SQLite directly in the browser
-* Building applications around a local-first architecture
-
-
-## Tech Stack
+### Tech Stack
 
 The application was built using:
 * vuejs
 * sql.js, in-memory SQLite database.
-* IndexedDB stores the current SQLite database state, for browser persistence.
+* IndexedDB to persist the SQLite database state across the browser reloads/refreshes.
 
-Users may:
+Users can:
 
 * start with an empty database
 * upload an existing SQLite database file
 * download/export their database at any time
 
+### Lifecycle & Persistence
 When the application reloads/browser refreshes:
-
 * if a database exists in IndexedDB, it is restored automatically
-* otherwise users may:
-  * upload a database
-  * start fresh
+* otherwise users can choose to upload an existing database or start fresh.
 
-
-## Database Schema
+### Database Schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS job_applications(
@@ -48,7 +40,7 @@ CREATE TABLE IF NOT EXISTS events(
 );
 ```
 
-## Running Locally
+### Running Locally
 
 ```bash
 npm install
