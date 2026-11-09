@@ -16,8 +16,9 @@
       @add-event="addEvent"
       @delete-event="deleteEvent"
     />
-  
+
     <ApplicationsHolder
+      class="flex h-screen min-h-0 flex-col overflow-hidden"
       :companies="companies_prop"
       :applicationStatusOptions="applicationStatusOptions"
       @filter-by-company="filterApplicationsByCompany"
@@ -26,6 +27,7 @@
       @update-short-note="updateShortNote"
       @update-application-notes="updateApplicationNotes"
     />
+
   </div>
   
   <div v-else>
