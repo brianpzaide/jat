@@ -1,43 +1,69 @@
 <template>
-    <div class="company-header" @click="toggle()">
-        <span class="arrow">
-          {{ expanded ? "▼" : "▶" }}
-        </span>
+  <div class="w-full">
+    <button
+      class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left
+             transition-colors hover:bg-gray-100 focus:outline-none
+             focus-visible:ring-2 focus-visible:ring-indigo-500"
+      @click="toggle"
+    >
+      <span
+        class="text-xs text-gray-400 transition-transform"
+        :class="{ 'rotate-90': expanded }"
+        aria-hidden="true"
+      >
+        ▶
+      </span>
 
-        <span class="company-name">
-          {{ company.name }}
-        </span>
-    </div>
+      <span class="min-w-0 flex-1 truncate text-sm font-semibold text-gray-800">
+        {{ company.name }}
+      </span>
 
-    <div v-if="expanded" class="position-container">
-        <div
-          v-for="application in company.applications"
-          :key="application.id"
-          class="position-card"
-          :class="{ active: application.id === activeApplicationId }"
-          @click="emit('application-selected', application.id)"
-        >
-            <div class="position-row">
-                <span class="position-title">
-                    {{ application.position }}
-                </span>
+      <span class="text-xs text-gray-400">
+        {{ company.applications.length }}
+      </span>
+    </button>
 
-                <span
-                  class="status-pill"
-                  :class="statusClass(application.status)"
-                >
-                    {{ application.status }}
-                </span>
-            </div>
+    <div v-if="expanded" class="ml-3 mt-1 space-y-1 border-l border-gray-200 pl-3">
+      <button
+        v-for="application in company.applications"
+        :key="application.id"
+        class="w-full rounded-lg border px-3 py-2.5 text-left transition-colors
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+        :class="
+          application.id === activeApplicationId
+            ? 'border-indigo-200 bg-indigo-50'
+            : 'border-transparent bg-white hover:border-gray-200 hover:bg-gray-50'
+        "
+        @click="emit('application-selected', application.id)"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span
+            class="min-w-0 truncate text-sm font-medium"
+            :class="
+              application.id === activeApplicationId
+                ? 'text-indigo-900'
+                : 'text-gray-700'
+            "
+          >
+            {{ application.position }}
+          </span>
+
+          <span
+            class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
+            :class="statusClass(application.status)"
+          >
+            {{ application.status }}
+          </span>
         </div>
+      </button>
     </div>
+  </div>
 </template>
 
-
 <script setup>
-import { computed, reactive, ref } from "vue"
+import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   /*
   applications example:
   {
@@ -55,99 +81,25 @@ const props = defineProps({
   activeApplicationId: [String, Number]
 })
 
-const expanded = ref(false)
 const emit = defineEmits(['application-selected'])
 
-function toggle(id) {
+const expanded = ref(false)
+
+function toggle() {
   expanded.value = !expanded.value
 }
 
-function formatNextevent(date) {
-  if (!date) return ""
-  const d = new Date(date)
-  return d.toLocaleDateString()
-}
-
 function statusClass(status) {
-  return status.toLowerCase().replaceAll(" ", "-")
-}
+  const classes = {
+    'ready-to-apply': 'bg-blue-100 text-blue-700',
+    'in-progress': 'bg-amber-100 text-amber-700',
+    'offer': 'bg-green-100 text-green-700',
+    'reject': 'bg-red-100 text-red-700',
+    'archive': 'bg-gray-100 text-gray-600'
+  }
 
+  const key = status.toLowerCase().replaceAll(' ', '-')
+
+  return classes[key] || 'bg-gray-100 text-gray-600'
+}
 </script>
-
-<style scoped>
-.company-header {
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 4px;
-}
-
-.company-header:hover {
-  background: #f5f5f5;
-}
-
-.arrow {
-  font-size: 12px;
-}
-
-.position-container {
-  margin-left: 18px;
-}
-
-.position-card {
-  border: 1px solid #e2e2e2;
-  border-radius: 6px;
-  padding: 6px 8px;
-  margin: 6px 0;
-  font-size: 0.85rem;
-}
-
-.position-card.active {
-  border-color: #4f46e5;
-  background: #eef2ff;
-}
-
-.position-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.position-title {
-  font-weight: 500;
-}
-
-
-.nextevent {
-  font-size: 0.75rem;
-  color: #777;
-}
-
-.status-pill {
-  font-size: 0.65rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  color: white;
-}
-
-.status-pill.offer {
-  background: #4caf50;
-}
-
-.status-pill.in-progress {
-  background: #ff9800;
-}
-
-.status-pill.reject {
-  background: #f7160e;
-}
-
-.status-pill.ready-to-apply {
-  background: #4b5dd0;
-}
-
-.status-pill.archive {
-  background: #5a5b63;
-}
-</style>

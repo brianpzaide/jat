@@ -4,19 +4,19 @@
       @click="exportDatabase">
       Download database
     </button>
-
+  
     <NewJobApplication
       :applicationStatusOptions="applicationStatusOptions"
       @add-new-application="addNewJobApplication"
     />
-
+  
     <EventHeatmap
       :jatEvents="jatEvents"
       :year="2026"
       @add-event="addEvent"
       @delete-event="deleteEvent"
     />
-
+  
     <ApplicationsHolder
       :companies="companies_prop"
       :applicationStatusOptions="applicationStatusOptions"
@@ -27,7 +27,7 @@
       @update-application-notes="updateApplicationNotes"
     />
   </div>
-
+  
   <div v-else>
     <div class="startup">
       <input

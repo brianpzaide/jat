@@ -14,10 +14,14 @@
     "marked": "^17.0.3",
     "sql.js": "^1.14.1",
     "vue": "^3.5.29",
+    "vue-router": "^4.6.4",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.4",
+    "autoprefixer": "^10.6.2",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^3.4.19",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.6"
   },

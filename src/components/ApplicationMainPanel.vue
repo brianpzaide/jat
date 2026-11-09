@@ -1,68 +1,43 @@
 <template>
-  <div class="main-panel">
-    <div class="details-container">
-      <ApplicationDetails
-        :application="application"
-        :applicationStatusOptions="applicationStatusOptions"
-        @update-application-status="forwardUpdateApplicationStatus"
-      />
-    </div>
-    <div class="notes-container">
+  <div class="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4">
+    <ApplicationDetails
+      :application="props.application"
+      :applicationStatusOptions="props.applicationStatusOptions"
+      @update-application-status="forwardUpdateApplicationStatus"
+    />
+
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col">
       <ApplicationNotes
-        :application="application"
+        :application="props.application"
         @update-application-notes="forwardUpdateApplicationNotes"
       />
     </div>
-
   </div>
 </template>
 
 <script setup>
-
-import ApplicationDetails from "./ApplicationDetails.vue"
-import ApplicationNotes from "./ApplicationNotes.vue"
+import ApplicationDetails from './ApplicationDetails.vue'
+import ApplicationNotes from './ApplicationNotes.vue'
 
 const props = defineProps({
   application: {
-    type: Object
+    type: Object,
   },
   applicationStatusOptions: {
     type: Array,
   },
 })
 
-
-const emit = defineEmits(["update-application-status", "update-application-notes"])
+const emit = defineEmits([
+  'update-application-status',
+  'update-application-notes',
+])
 
 function forwardUpdateApplicationStatus(payload) {
-  emit("update-application-status", payload)
+  emit('update-application-status', payload)
 }
 
 function forwardUpdateApplicationNotes(payload) {
-  emit("update-application-notes", payload)
+  emit('update-application-notes', payload)
 }
-
-
 </script>
-
-<style scoped>
-.main-panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  gap: 16px;
-  flex: 1;
-  min-width: 0;
-  gap: 16px;
-}
-
-.details-container {
-  flex: none;
-  width: 100%;
-}
-
-.notes-container {
-    width: min(1000px, 92vw);
-    height: min(800px, 90vh);
-}
-</style>

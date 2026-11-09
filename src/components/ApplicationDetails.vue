@@ -1,148 +1,53 @@
 <template>
-  <div class="application-details" v-if="application">
-    <div class="header">
+  <div
+    v-if="props.application"
+    class="border-b border-gray-200 px-5 py-4"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="min-w-0">
+        <h2 class="text-2xl font-semibold text-gray-900">
+          {{ props.application.company }}
+        </h2>
 
-      <div class="company-name">
-        {{ application.company }}
+        <p class="mt-1 text-xl text-gray-500">
+          {{ props.application.position }}
+        </p>
       </div>
 
-      <div class="position-name">
-        {{ application.position }}
-      </div>
-
-      <div class="application-status">
-        <template v-if="!editing">
-          <span
-              class="status-pill"
-              :class="statusClass(application.status)"
-            >{{ application.status }}
-          </span>
-        </template>
-
-        <div v-else>
-          <select v-model="editedStatus">
-            <option 
-              v-for="status in applicationStatusOptions"
-              :key="status"
-              :value="status">{{status}}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button v-if="!editing" @click="startEdit">
-          Edit
-        </button>
-
-        <button v-else @click="updateApplicationStatus">
-          Update
-        </button>
-      </div>
-
+      <select
+        :value="props.application.status"
+        class="w-44 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        @change="updateApplicationStatus($event.target.value)"
+      >
+        <option
+          v-for="status in props.applicationStatusOptions ?? []"
+          :key="status"
+          :value="status"
+        >
+          {{ status }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue"
 
 const props = defineProps({
   application: {
-    type: Object
+    type: Object,
   },
   applicationStatusOptions: {
     type: Array,
-  },  
+  },
 })
 
-const emit = defineEmits(["update-application-status"])
+const emit = defineEmits(['update-application-status'])
 
-const editing = ref(false)
-const editedStatus = ref("")
-
-watch(
-  () => props.application,
-  (application) => {
-    if (application) {
-      editedStatus.value = application.status
-    }
-  },
-  { immediate: true }
-)
-
-function startEdit() {
-  editing.value = true
-}
-
-function updateApplicationStatus() {
-  emit("update-application-status", {
+function updateApplicationStatus(status) {
+  emit('update-application-status', {
     applicationId: props.application.id,
-    status: editedStatus.value,
+    status,
   })
-
-  editing.value = false
 }
-
-
-function statusClass(status) {
-  return status.toLowerCase().replaceAll(" ", "-")
-}
-
 </script>
-
-<style scoped>
-
-.application-details {
-  border-bottom: 1px solid #ddd;
-  padding: 12px;
-}
-
-.header {
-  display: flex;
-  justify-content:space-around;
-}
-
-.company-name {
-  font-weight: 600;
-  font-size: .95rem;
-}
-
-.position-name {
-  font-weight: 600;
-  font-size: .95rem;
-}
-
-.actions button {
-  padding: 4px 10px;
-}
-
-.status-pill {
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  /* color: white; */
-  background-color: white;
-}
-
-.status-pill.offer {
-  background: #4caf50;
-}
-
-.status-pill.in-progress {
-  background: #ff9800;
-}
-
-.status-pill.reject {
-  background: #f7160e;
-}
-
-.status-pill.ready-to-apply {
-  background: #4b5dd0;
-}
-
-.status-pill.archive {
-  background: #5a5b63;
-  color: white;
-}
-
-</style>

@@ -1,111 +1,210 @@
 <template>
-  <div class="card">
-    <h2>{{ year }} Calendar</h2>
+  <div class="m-5 text-center rounded-xl border border-gray-200 bg-white p-6">
+    <h2 class="mb-5 text-lg font-semibold text-gray-900">
+      {{ props.year }} Calendar
+    </h2>
 
-    <div class="heatmap">
+    <div class="flex flex-wrap justify-center gap-5">
       <div
-        v-for="(month, index) in months"
-        :key="index"
-        class="month"
+        v-for="month in months"
+        :key="month.index"
+        class="flex flex-col items-center"
       >
-        <div class="month-label">{{ month.name }}</div>
+        <div class="mb-2 text-xs font-medium text-gray-600">
+          {{ month.name }}
+        </div>
 
-        <div class="month-grid">
-          <div
+        <div
+          class="grid grid-flow-col grid-rows-[repeat(7,10px)] auto-cols-[10px] gap-[3px]"
+        >
+          <button
             v-for="day in month.days"
             :key="day.date"
-            class="day"
-            :class="'level-' + getLevel(day.events.length)"
+            type="button"
+            class="h-[10px] w-[10px] rounded-[2px] transition-opacity hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="getLevelClass(day.events.length)"
             :style="{ gridRowStart: day.weekday + 1 }"
+            :aria-label="`${day.date}: ${day.events.length} events`"
             @mouseenter="showTooltip($event, day)"
             @mousemove="moveTooltip"
             @mouseleave="hideTooltip"
+            @focus="showTooltip($event, day)"
+            @blur="hideTooltip"
             @click="dayClicked(day)"
           />
         </div>
       </div>
     </div>
+  </div>
+
+  <div
+    v-if="tooltip.visible"
+    class="pointer-events-none fixed z-[9999] w-[220px] rounded-lg border border-gray-200 bg-white p-3 text-xs shadow-lg"
+    :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
+  >
+    <strong class="mb-2 block text-gray-900">
+      {{ tooltip.date }}
+    </strong>
+
+    <div v-if="tooltip.events.length === 0" class="text-gray-500">
+      No events
+    </div>
 
     <div
-      v-if="tooltip.visible"
-      class="tooltip"
-      :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
+      v-for="event in tooltip.events"
+      :key="event.id ?? event.time"
+      class="mb-1 last:mb-0"
     >
-      <strong>{{ tooltip.date }}</strong>
-
-      <div v-if="tooltip.events.length === 0">
-        No events
-      </div>
-
-      <div v-for="e in tooltip.events" :key="e.time">
-        {{ e.time }} : {{ e.title }}
-      </div>
+      <span class="font-medium text-gray-700">{{ event.time }}</span>
+      <span class="text-gray-600">: {{ event.title }}</span>
     </div>
   </div>
 
-  <div v-if="dialog.visible" class="dialog-overlay">
-    <div class="dialog">
-      <h3>Add Event</h3>
-      <div class="dialog-date">
-        {{ new Date(dialog.date).toDateString() }}
-      </div>
-      <input
-        v-model="dialog.time"
-        placeholder="Time (e.g. 10:00 - 11:00)"
-      />
-      <input
-        v-model="dialog.title"
-        placeholder="Event description"
-      />
-      <div class="dialog-actions">
-        <button @click="addEvent">Add Event</button>
-        <button @click="dialog.visible = false">Cancel</button>
-      </div>
-
-      <div
-        v-if="jatEvents[dialog.date]?.length"
-        class="event-list"
+  <dialog
+    ref="eventDialog"
+    aria-labelledby="event-dialog-title"
+    aria-describedby="event-dialog-description"
+    class="w-[calc(100%-2rem)] max-w-lg rounded-xl border border-gray-200 bg-white p-0 shadow-xl backdrop:bg-black/40"
+    @close="dialog.visible = false"
+  >
+    <div class="border-b border-gray-200 px-5 py-4">
+      <h3
+        id="event-dialog-title"
+        class="text-lg font-semibold text-gray-900"
       >
-        <div
-          v-for="e in jatEvents[dialog.date]"
-          :key="e.id"
-          class="event-item"
-        >
-          <button
-            class="delete-btn"
-            @click.stop="deleteEvent(e.id, dialog.date, e.time)"
+        Events
+      </h3>
+
+      <p
+        id="event-dialog-description"
+        class="mt-1 text-sm text-gray-500"
+      >
+        {{ formatDate(dialog.date) }}
+      </p>
+    </div>
+
+    <div class="space-y-4 px-5 py-4">
+      <div class="space-y-3">
+        <div>
+          <label
+            for="event-time"
+            class="mb-1.5 block text-sm font-medium text-gray-700"
           >
-            ×
-          </button>
+            Time
+          </label>
 
-          <div class="event-time">
-            {{ e.time }}
-          </div>
+          <input
+            id="event-time"
+            v-model="dialog.time"
+            type="text"
+            placeholder="e.g. 10:00 - 11:00"
+            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+          />
+        </div>
 
-          <div class="event-title">
-            {{ e.title }}
-          </div>
+        <div>
+          <label
+            for="event-description"
+            class="mb-1.5 block text-sm font-medium text-gray-700"
+          >
+            Description
+          </label>
+
+          <input
+            id="event-description"
+            v-model="dialog.title"
+            type="text"
+            placeholder="e.g. Meeting with the team"
+            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+          />
         </div>
       </div>
 
-      <div
-        v-else
-        class="no-events"
-      >
-        No events for this date
-      </div>
+      <div>
+        <h4 class="mb-2 text-sm font-medium text-gray-700">
+          Events for this date
+        </h4>
 
+        <div
+          v-if="props.jatEvents[dialog.date]?.length"
+          class="max-h-56 space-y-2 overflow-y-auto overscroll-contain"
+        >
+          <div
+            v-for="event in props.jatEvents[dialog.date]"
+            :key="event.id ?? event.time"
+            class="flex items-start justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+          >
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-gray-600">
+                {{ event.time }}
+              </div>
+
+              <div class="mt-1 break-words text-sm text-gray-900">
+                {{ event.title }}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              aria-label="Delete event"
+              class="shrink-0 rounded-md px-2 py-1 text-lg leading-none text-red-500 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+              @click.stop="deleteEvent(event.id, dialog.date, event.time)"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div
+          v-else
+          class="rounded-lg border border-dashed border-gray-200 py-5 text-center text-sm text-gray-500"
+        >
+          No events for this date
+        </div>
+      </div>
     </div>
-  </div>
+
+    <div class="flex justify-end gap-2 border-t border-gray-200 bg-gray-50 px-5 py-3">
+      <button
+        type="button"
+        class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        @click="eventDialog.close()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        @click="addEvent"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14" />
+          <path d="M5 12h14" />
+        </svg>
+        Add event
+      </button>
+    </div>
+  </dialog>
 </template>
 
 <script setup>
-import { computed, reactive } from "vue"
+import { computed, reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   year: {
     type: Number,
-    default: new Date().getFullYear()
+    default: () => new Date().getFullYear(),
   },
 
   /*
@@ -120,342 +219,151 @@ const props = defineProps({
   */
   jatEvents: {
     type: Object,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 })
+
+const emit = defineEmits(['add-event', 'delete-event'])
+
+const monthNames = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
+
+const eventDialog = ref(null)
 
 const dialog = reactive({
   visible: false,
-  date: "",
-  time: "",
-  title: ""
+  date: '',
+  time: '',
+  title: '',
 })
 
-const emit = defineEmits(["add-event", "delete-event"])
+watch(
+  () => dialog.visible,
+  (visible) => {
+    const element = eventDialog.value
 
-const monthNames = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec"
-]
+    if (!element) return
+
+    if (visible && !element.open) {
+      element.showModal()
+    } else if (!visible && element.open) {
+      element.close()
+    }
+  }
+)
+
+const tooltip = reactive({
+  visible: false,
+  x: 0,
+  y: 0,
+  date: '',
+  events: [],
+})
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate()
 }
 
 function formatKey(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function formatDate(dateKey) {
+  if (!dateKey) return ''
+
+  const [year, month, day] = dateKey.split('-').map(Number)
+
+  return new Date(year, month - 1, day).toDateString()
 }
 
 const months = computed(() => {
   const result = []
 
   for (let month = 0; month < 12; month++) {
-
-    const daysInMonth = getDaysInMonth(props.year, month)
     const days = []
 
-    for (let day = 1; day <= daysInMonth; day++) {
+    const daysInMonth = getDaysInMonth(props.year, month)
 
+    for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(props.year, month, day)
       const key = formatKey(date)
 
       days.push({
         date: key,
         weekday: date.getDay(),
-        events: props.jatEvents[key] || []
+        events: props.jatEvents[key] || [],
       })
     }
 
     result.push({
       index: month,
       name: monthNames[month],
-      days
+      days,
     })
   }
 
   return result
 })
 
-function getLevel(count) {
-  if (count === 0) return 0
-  if (count === 1) return 1
-  if (count <= 2) return 2
-  if (count <= 4) return 3
-  return 4
+function getLevelClass(count) {
+  if (count === 0) return 'bg-gray-100'
+  if (count === 1) return 'bg-green-200'
+  if (count <= 2) return 'bg-green-400'
+  if (count <= 4) return 'bg-green-600'
+
+  return 'bg-green-800'
 }
 
-const tooltip = reactive({
-  visible: false,
-  x: 0,
-  y: 0,
-  date: "",
-  events: []
-})
-
-function showTooltip(e, day) {
+function showTooltip(event, day) {
   tooltip.visible = true
-  tooltip.date = new Date(day.date).toDateString()
+  tooltip.date = formatDate(day.date)
   tooltip.events = day.events
-  moveTooltip(e)
+
+  moveTooltip(event)
 }
 
-function moveTooltip(e) {
-  tooltip.x = e.clientX + 8
-  tooltip.y = e.clientY + 8
+function moveTooltip(event) {
+  tooltip.x = event.clientX + 8
+  tooltip.y = event.clientY + 8
 }
 
 function hideTooltip() {
   tooltip.visible = false
 }
 
-function dayClicked(day) {
+function openDialog(date) {
   dialog.visible = true
-  dialog.date = day.date
-  dialog.time = ""
-  dialog.title = ""
+  dialog.date = date
+  dialog.time = ''
+  dialog.title = ''
+}
+
+function dayClicked(day) {
+  openDialog(day.date)
 }
 
 function addEvent() {
   if (!dialog.time || !dialog.title) return
-  emit("add-event", {
+
+  emit('add-event', {
     date: dialog.date,
     time: dialog.time,
-    title: dialog.title
+    title: dialog.title,
   })
 }
 
-function deleteEvent(event_id, eDate, eTime) {
-  if (!eDate || !eTime || !event_id) return
-  emit("delete-event", {
-    event_id: event_id,
-    date: eDate,
-    time: eTime
+function deleteEvent(eventId, eventDate, eventTime) {
+  if (!eventDate || !eventTime || !eventId) return
+
+  emit('delete-event', {
+    event_id: eventId,
+    date: eventDate,
+    time: eventTime,
   })
 }
-
 </script>
-
-<style scoped>
-.card {
-  background: #ffffff;
-  padding: 24px 28px;
-  border-radius: 10px;
-
-  border: 1px solid #e5e7eb;
-
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-
-  margin: 20px;
-}
-
-.card h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
-}
-
- .heatmap {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 18px;
-}
-
-.month {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.month-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #666;
-}
-
-.month-grid {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(7, 9px);
-  grid-auto-columns: 10px;
-  gap: 3px;
-}
-
-.day {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-
-  cursor: pointer;
-}
-
-.level-0 { background: #ebedf0; }
-.level-1 { background: #c6e48b; }
-.level-2 { background: #7bc96f; }
-.level-3 { background: #239a3b; }
-.level-4 { background: #196127; }
-
-.tooltip {
-  position: fixed;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  pointer-events: none;
-  width: 220px;
-  max-width: 220px;
-  z-index: 9999;
-}
-
-.dialog-overlay {
-
-  position: fixed;
-  inset: 0;
-
-  background: rgba(0,0,0,0.35);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  z-index: 10000;
-}
-
-.dialog {
-  background: white;
-
-  padding: 20px 24px;
-  border-radius: 8px;
-
-  width: 320px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.dialog h3 {
-  margin: 0;
-}
-
-.dialog-date {
-  font-size: 13px;
-  color: #666;
-}
-
-.dialog input {
-  padding: 6px 8px;
-
-  border: 1px solid #ddd;
-  border-radius: 4px;
-
-  font-size: 13px;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.dialog-actions button {
-  padding: 6px 10px;
-  font-size: 13px;
-
-  border: 1px solid #ddd;
-  border-radius: 4px;
-
-  background: #f5f5f5;
-  cursor: pointer;
-}
-
-.dialog-actions button:hover {
-  background: #eaeaea;
-}
-
-
-
-.event-list {
-  max-height: 220px;
-  overflow-y: auto;
-
-  overscroll-behavior: contain;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-
-  padding: 8px;
-}
-
-.event-item {
-  position: relative;
-
-  padding: 10px 12px;
-  padding-right: 32px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-
-  background: #f9fafb;
-}
-
-.event-time {
-  font-size: 12px;
-  font-weight: 600;
-  color: #555;
-}
-
-.event-title {
-  font-size: 13px;
-  color: #222;
-
-  margin-top: 4px;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-
-  width: 20px;
-  height: 20px;
-
-  border: none;
-  border-radius: 50%;
-
-  background: transparent;
-  color: #888;
-
-  cursor: pointer;
-
-  font-size: 14px;
-  line-height: 20px;
-  text-align: center;
-}
-
-.delete-btn:hover {
-  background: #ef4444;
-  color: white;
-}
-
-.no-events {
-  font-size: 13px;
-  color: #777;
-  text-align: center;
-  padding: 10px 0;
-}
-</style>

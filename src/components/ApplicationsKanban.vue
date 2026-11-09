@@ -1,16 +1,18 @@
 <template>
-  <div class="kanban-board">
-    <KanbanColumn
-      v-for="option in applicationStatusOptions"
-      :key="option"
-      :statusKey="option"
-      :applications="getApplicationsForColumn(option)"
-      :activeApplicationId="activeApplicationId"
-      @application-selected="forwardApplicationSelected"
-      @update-short-note="forwardUpdateShortNote"
-      @update-application-notes="forwardUpdateApplicationNotes"
-      @application-moved="forwardApplicationStatus"
-    />
+  <div class="h-full min-h-0 w-full min-w-0 overflow-x-auto overflow-y-hidden">
+    <div class="flex h-full min-w-max gap-3 p-2">
+      <KanbanColumn
+        v-for="option in applicationStatusOptions"
+        :key="option"
+        :statusKey="option"
+        :applications="getApplicationsForColumn(option)"
+        :activeApplicationId="activeApplicationId"
+        @application-selected="forwardApplicationSelected"
+        @update-short-note="forwardUpdateShortNote"
+        @update-application-notes="forwardUpdateApplicationNotes"
+        @application-moved="forwardApplicationStatus"
+      />
+    </div>
   </div>
 </template>
 
@@ -62,15 +64,3 @@ function forwardApplicationStatus(payload){
 
 
 </script>
-
-<style scoped>
-.kanban-board {
-  display: flex;
-  gap: 8px;
-  height: 100vh;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 8px;
-}
-
-</style>
